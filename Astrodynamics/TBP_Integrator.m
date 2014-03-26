@@ -70,11 +70,4 @@ x_0=[r_0;v_0];%stack the state variables
 r=x(:,1:3)';
 v=x(:,4:6)';
 
-figure
-plot3(r(1,:),r(2,:),r(3,:))
-xlabel('x')
-ylabel('y')
-zlabel('z')
-grid on
-
 end
