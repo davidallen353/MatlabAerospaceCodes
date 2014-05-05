@@ -1,0 +1,4308 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[    173267,       4299]
+NotebookOptionsPosition[    165151,       4051]
+NotebookOutlinePosition[    165509,       4067]
+CellTagsIndexPosition[    165466,       4064]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+Spacecraft With Momentum Exchange Devices\
+\>", "Title",
+ CellChangeTimes->{{3.608042574012122*^9, 3.608042584382531*^9}}],
+
+Cell["\<\
+A notebook for drawing diagrams of spacecraft with momentum exchange devices.\
+\
+\>", "Subtitle",
+ CellChangeTimes->{{3.60804259570782*^9, 3.608042619839028*^9}}],
+
+Cell["\<\
+David Allen
+Aerospace Engineering
+Virginia Tech
+davidallen@vt.edu
+2 May 2014\
+\>", "Subsubtitle",
+ CellChangeTimes->{{3.608042624328157*^9, 3.608042651847455*^9}}],
+
+Cell["\<\
+LICENSE: You are free to use, modify, or reproduce this file. Anything \
+derived from this file must include this license. If this file, or any \
+program derived from this file, is used in the production of any published \
+documents (e.g. conference or journal papers), the acknowledgments or \
+citations must identify that some figures were generated using code written \
+by David Allen, the author of this file.  If you do not agree to the terms of \
+this license, do not use this program.\
+\>", "Text",
+ CellChangeTimes->{{3.60807926461482*^9, 3.6080793378317137`*^9}, {
+   3.608079456811975*^9, 3.60807975383762*^9}, {3.608079785942513*^9, 
+   3.608079790226758*^9}, 3.608303095757429*^9}],
+
+Cell[BoxData[
+ RowBox[{"Remove", "[", "\"\<Global`*\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.60804295562808*^9, 3.608042963276043*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Generic Functions", "Section",
+ CellChangeTimes->{{3.608042974128674*^9, 3.6080429812394238`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Rotations", "Subsection",
+ CellChangeTimes->{{3.608043066141796*^9, 3.608043067116909*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["General Matricies", "Subsubsection",
+ CellChangeTimes->{{3.608043082198586*^9, 3.608043090804921*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rx", "[", "\[Theta]_", "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {"1", "0", "0"},
+      {"0", 
+       RowBox[{"Cos", "[", "\[Theta]", "]"}], 
+       RowBox[{"-", 
+        RowBox[{"Sin", "[", "\[Theta]", "]"}]}]},
+      {"0", 
+       RowBox[{"Sin", "[", "\[Theta]", "]"}], 
+       RowBox[{"Cos", "[", "\[Theta]", "]"}]}
+     }], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Ry", "[", "\[Theta]_", "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {
+       RowBox[{"Cos", "[", "\[Theta]", "]"}], "0", 
+       RowBox[{"Sin", "[", "\[Theta]", "]"}]},
+      {"0", "1", "0"},
+      {
+       RowBox[{"-", 
+        RowBox[{"Sin", "[", "\[Theta]", "]"}]}], "0", 
+       RowBox[{"Cos", "[", "\[Theta]", "]"}]}
+     }], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rz", "[", "\[Theta]_", "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {
+       RowBox[{"Cos", "[", "\[Theta]", "]"}], 
+       RowBox[{"-", 
+        RowBox[{"Sin", "[", "\[Theta]", "]"}]}], "0"},
+      {
+       RowBox[{"Sin", "[", "\[Theta]", "]"}], 
+       RowBox[{"Cos", "[", "\[Theta]", "]"}], "0"},
+      {"0", "0", "1"}
+     }], ")"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608043092762003*^9, 3.608043279098756*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Roll, Pitch, Yaw Rotations", "Subsubsection",
+ CellChangeTimes->{{3.6080429892248898`*^9, 3.608043000455847*^9}}],
+
+Cell["\<\
+The roll, pitch, yaw angles are the inputs\
+\>", "Text",
+ CellChangeTimes->{{3.608043297413302*^9, 3.608043305700173*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rrpy", "[", 
+    RowBox[{"roll_", ",", "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"Rz", "[", "yaw", "]"}], ".", 
+    RowBox[{"Ry", "[", "pitch", "]"}], ".", 
+    RowBox[{"Rx", "[", "roll", "]"}]}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608043307848743*^9, 3.6080433527619762`*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Functions for generating shapes", "Section",
+ CellChangeTimes->{{3.608042660100767*^9, 3.608042693855763*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["VSCMG (or CMG) with frame", "Subsection",
+ CellChangeTimes->{{3.608042732205669*^9, 3.6080427466283817`*^9}}],
+
+Cell["\<\
+This section will generate functions that create 3D objects of rotors \
+\>", "Text",
+ CellChangeTimes->{{3.608042768726201*^9, 3.6080427916650553`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+The rotor (midpoint, radius, thickness, RPY angles)\
+\>", "Subsubsection",
+ CellChangeTimes->{{3.6080428093388147`*^9, 3.608042825621769*^9}, {
+  3.608043385986248*^9, 3.6080433885453367`*^9}}],
+
+Cell["First calculate the endpoints", "Text",
+ CellChangeTimes->{{3.6080430106863947`*^9, 3.608043017228156*^9}, {
+  3.608043437614306*^9, 3.608043445373972*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Endpoint1", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", GridBox[{
+       {"xmid"},
+       {"ymid"},
+       {"zmid"}
+      }], ")"}], "+", 
+    RowBox[{
+     RowBox[{"Rrpy", "[", 
+      RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+     RowBox[{"(", GridBox[{
+        {"0"},
+        {"0"},
+        {
+         RowBox[{"thickness", "/", "2"}]}
+       }], ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Endpoint2", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", GridBox[{
+       {"xmid"},
+       {"ymid"},
+       {"zmid"}
+      }], ")"}], "-", 
+    RowBox[{
+     RowBox[{"Rrpy", "[", 
+      RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+     RowBox[{"(", GridBox[{
+        {"0"},
+        {"0"},
+        {
+         RowBox[{"thickness", "/", "2"}]}
+       }], ")"}]}]}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608043446641543*^9, 3.608043641242342*^9}, {
+  3.608043786586403*^9, 3.608043810751186*^9}, {3.6080438420143967`*^9, 
+  3.60804386158706*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"x1", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"y1", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"z1", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"x2", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"y2", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"z2", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "roll_", ",",
+      "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Endpoint2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608043873863706*^9, 3.608043884935244*^9}}],
+
+Cell["\<\
+A function that takes chosen inputs and uses the cylinder function to make a \
+rotor.\
+\>", "Text",
+ CellChangeTimes->{{3.60804390336742*^9, 3.608043913812687*^9}, {
+  3.6080440065911016`*^9, 3.608044020110681*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rotor", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "radius_", 
+     ",", "roll_", ",", "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Cylinder", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"x1", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}], ",", 
+         RowBox[{"y1", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}], ",", 
+         RowBox[{"z1", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"x2", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}], ",", 
+         RowBox[{"y2", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}], ",", 
+         RowBox[{"z2", "[", 
+          RowBox[{
+          "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "roll", 
+           ",", "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], ",", 
+     "radius"}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608042850407995*^9, 3.608042917847484*^9}, {
+  3.608043396675449*^9, 3.6080434326709957`*^9}, {3.608043651515929*^9, 
+  3.6080436518979797`*^9}, {3.608044027889637*^9, 3.6080441183192387`*^9}}],
+
+Cell["Test the function", "Text",
+ CellChangeTimes->{{3.608044145121262*^9, 3.608044149844067*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"Rotor", "[", 
+     RowBox[{
+     "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "radius", ",", 
+      "roll", ",", "pitch", ",", "yaw"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"xmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"ymid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"zmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6080441837806253`*^9, 3.6080443251327257`*^9}, 
+   3.608044392766448*^9}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+    0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+    0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5, Typeset`show$$ = 
+    True, Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`xmid$$], -5, 5}, {
+      Hold[$CellContext`ymid$$], -5, 5}, {
+      Hold[$CellContext`zmid$$], -5, 5}, {
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {193., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`xmid$45976$$ = 
+    0, $CellContext`ymid$45977$$ = 0, $CellContext`zmid$45978$$ = 
+    0, $CellContext`thickness$45979$$ = 0, $CellContext`radius$45980$$ = 
+    0, $CellContext`roll$45981$$ = 0, $CellContext`pitch$45982$$ = 
+    0, $CellContext`yaw$45983$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+        0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+        0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`xmid$$, $CellContext`xmid$45976$$, 0], 
+        Hold[$CellContext`ymid$$, $CellContext`ymid$45977$$, 0], 
+        Hold[$CellContext`zmid$$, $CellContext`zmid$45978$$, 0], 
+        Hold[$CellContext`thickness$$, $CellContext`thickness$45979$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$45980$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$45981$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$45982$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$45983$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`Rotor[$CellContext`xmid$$, $CellContext`ymid$$, \
+$CellContext`zmid$$, $CellContext`thickness$$, $CellContext`radius$$, \
+$CellContext`roll$$, $CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`xmid$$, -5, 
+         5}, {$CellContext`ymid$$, -5, 5}, {$CellContext`zmid$$, -5, 
+         5}, {$CellContext`thickness$$, 0, 5}, {$CellContext`radius$$, 0, 
+         5}, {$CellContext`roll$$, 0, 2 Pi}, {$CellContext`pitch$$, 0, 2 
+         Pi}, {$CellContext`yaw$$, 0, 2 Pi}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{665., {221., 227.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{{3.6080733544105673`*^9, 3.608073373744326*^9}, 
+   3.6080737187791157`*^9, {3.608073842621316*^9, 3.608073855750896*^9}, 
+   3.608073925675439*^9, 3.608076473333108*^9, {3.608077285018248*^9, 
+   3.608077292935835*^9}, 3.608077361235076*^9, 3.608077493616004*^9, 
+   3.608077537985936*^9, 3.608077655947604*^9, 3.608077777287319*^9, 
+   3.608077818594082*^9, 3.608078242890427*^9, 3.608078286294339*^9, 
+   3.608078721353142*^9, 3.608079811628099*^9, 3.608079879756813*^9, 
+   3.608080025392149*^9, 3.608161428810033*^9, 3.6082914283414*^9, 
+   3.6082914808436537`*^9, 3.608292380565484*^9, 3.6082924530594473`*^9, 
+   3.608292537619109*^9, 3.60829287223807*^9, 3.60829297588378*^9, 
+   3.608293564776106*^9, 3.608293778899688*^9, 3.608294181310893*^9, 
+   3.608295562406781*^9, 3.608295930147601*^9, 3.608295987731216*^9, 
+   3.608296066080583*^9, {3.6082963229508543`*^9, 3.608296347199156*^9}, 
+   3.608296631208507*^9, {3.608296666102743*^9, 3.6082966798238*^9}, {
+   3.6082967388810167`*^9, 3.608296760639626*^9}, {3.608296809312805*^9, 
+   3.6082968681583853`*^9}, {3.6082969103487787`*^9, 3.608296963145949*^9}, {
+   3.608297001231985*^9, 3.608297047491259*^9}, {3.608297101861644*^9, 
+   3.608297185328227*^9}, {3.608297218108446*^9, 3.60829726913074*^9}, 
+   3.608297345507839*^9, {3.6082974110925083`*^9, 3.608297477425415*^9}, 
+   3.608297512739354*^9, {3.6082975809978647`*^9, 3.608297638582817*^9}, 
+   3.60829779137729*^9, {3.60829788347512*^9, 3.6082979046486692`*^9}, {
+   3.608297939170238*^9, 3.608297965322296*^9}, 3.608298017558999*^9, 
+   3.608298077034807*^9, 3.608302324690181*^9, 3.608302494727132*^9, 
+   3.608302636340417*^9, 3.608302688982212*^9, 3.6083028608101387`*^9, {
+   3.608302924531332*^9, 3.6083029620265617`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Graphics3D", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"Rotor", "[", 
+     RowBox[{"0", ",", "0", ",", "0", ",", "2", ",", "4", ",", 
+      RowBox[{"10", "\[Degree]"}], ",", 
+      RowBox[{"20", "\[Degree]"}], ",", "0"}], "]"}], ",", 
+    RowBox[{"Rotor", "[", 
+     RowBox[{"10", ",", "0", ",", "0", ",", "2", ",", "4", ",", 
+      RowBox[{"90", "\[Degree]"}], ",", "0", ",", "0"}], "]"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Rotor", "[", 
+     RowBox[{"0", ",", "10", ",", "0", ",", "2", ",", "4", ",", "0", ",", 
+      RowBox[{"45", "\[Degree]"}], ",", 
+      RowBox[{"30", "\[Degree]"}]}], "]"}]}], "}"}], "]"}]], "Input",
+ CellChangeTimes->{{3.6080441273959*^9, 3.608044127964314*^9}, {
+  3.608044535008884*^9, 3.608044745997695*^9}, {3.608074920887102*^9, 
+  3.608074924089973*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   CylinderBox[
+    NCache[{{Cos[10 Degree] Sin[20 Degree], -Sin[10 Degree], Cos[10 Degree] 
+       Cos[20 Degree]}, {-Cos[10 Degree] Sin[20 Degree], Sin[10 Degree], -
+       Cos[10 Degree] Cos[20 Degree]}}, {{
+     0.33682408883346515`, -0.17364817766693033`, 
+     0.9254165783983234}, {-0.33682408883346515`, 
+     0.17364817766693033`, -0.9254165783983234}}], 4], 
+   CylinderBox[{{10, -1, 0}, {10, 1, 0}}, 4], 
+   CylinderBox[
+    NCache[{{Rational[1, 2] Rational[3, 2]^Rational[1, 2], 10 + 
+       Rational[1, 2] 2^Rational[-1, 2], 2^Rational[-1, 2]}, {
+      Rational[-1, 2] Rational[3, 2]^Rational[1, 2], 10 + 
+       Rational[-1, 2] 2^Rational[-1, 2], -2^Rational[-1, 2]}}, {{
+     0.6123724356957945, 10.353553390593273`, 
+     0.7071067811865475}, {-0.6123724356957945, 
+     9.646446609406727, -0.7071067811865475}}], 4]},
+  AutomaticImageSize->True,
+  ImageSize->{342.3430592155153, 283.6936024811328},
+  ViewPoint->{2.4983288481681787`, -0.9837030848434284, 2.059291433304229},
+  ViewVertical->{0.11306618063299473`, 0.26002165769933255`, 
+   2.1827787827532568`}]], "Output",
+ CellChangeTimes->{{3.608044715549781*^9, 3.608044746704482*^9}, 
+   3.6080716812570553`*^9, {3.608073354729128*^9, 3.60807337408631*^9}, 
+   3.608073719119671*^9, {3.60807384277039*^9, 3.608073855911249*^9}, 
+   3.608073925862783*^9, 3.6080764734706297`*^9, {3.608077285133608*^9, 
+   3.608077293102853*^9}, 3.6080773613622503`*^9, 3.608077493786458*^9, 
+   3.6080775381458817`*^9, 3.608077656100918*^9, 3.608077777456101*^9, 
+   3.608077818768847*^9, 3.608078243016212*^9, 3.6080782864455347`*^9, 
+   3.608078721514351*^9, 3.6080798117905893`*^9, 3.6080798798857*^9, 
+   3.608080025550371*^9, 3.608161428934526*^9, 3.608291428451778*^9, 
+   3.6082914808745317`*^9, 3.6082923806822968`*^9, 3.608292453179576*^9, 
+   3.60829253773978*^9, 3.608292872367374*^9, 3.608292976012038*^9, 
+   3.608293564905295*^9, 3.6082937790293293`*^9, 3.6082941813533*^9, 
+   3.608295562478115*^9, 3.608295930182295*^9, 3.608295987768198*^9, 
+   3.608296066129238*^9, {3.608296322998621*^9, 3.608296347229677*^9}, 
+   3.608296631256753*^9, {3.608296666152543*^9, 3.6082966798720512`*^9}, {
+   3.608296738927305*^9, 3.6082967606893463`*^9}, {3.608296809366716*^9, 
+   3.608296868211276*^9}, {3.608296910410437*^9, 3.608296963198248*^9}, {
+   3.608297001278866*^9, 3.608297047537706*^9}, {3.6082971019189997`*^9, 
+   3.608297185400093*^9}, {3.608297218166277*^9, 3.608297269185314*^9}, 
+   3.608297345553335*^9, {3.608297411141741*^9, 3.60829747747416*^9}, 
+   3.608297512788404*^9, {3.608297581076961*^9, 3.608297638664547*^9}, 
+   3.608297791421877*^9, {3.6082978835489397`*^9, 3.608297904742447*^9}, {
+   3.6082979392445498`*^9, 3.608297965385869*^9}, 3.608298017660194*^9, 
+   3.608298077137282*^9, 3.608302324819064*^9, 3.60830249486557*^9, 
+   3.608302636488246*^9, 3.6083026891358128`*^9, 3.608302860954584*^9, {
+   3.6083029246812067`*^9, 3.608302962166216*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Rotor with Axes", "Subsubsection",
+ CellChangeTimes->{{3.608071802347027*^9, 3.608071806400299*^9}}],
+
+Cell["Create the x axis", "Text",
+ CellChangeTimes->{{3.608071993212584*^9, 3.608071997861824*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisStart", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {"xmid"},
+      {"ymid"},
+      {"zmid"}
+     }], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisEnd", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", GridBox[{
+       {"xmid"},
+       {"ymid"},
+       {"zmid"}
+      }], ")"}], "+", 
+    RowBox[{
+     RowBox[{"Rrpy", "[", 
+      RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+     RowBox[{"(", GridBox[{
+        {"length"},
+        {"0"},
+        {"0"}
+       }], ")"}]}]}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072009597691*^9, 3.608072147273284*^9}, {
+   3.608072227947229*^9, 3.6080722775711813`*^9}, 3.608072313156479*^9}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisStartX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisStartY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisStartZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072323993029*^9, 3.608072394334856*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisEndX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisEndY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxisEndZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"xAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6080724293047037`*^9, 3.608072449255649*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"xAxis", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Arrow", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"xAxisStartX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"xAxisStartY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"xAxisStartZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"xAxisEndX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"xAxisEndY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"xAxisEndZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.608072885480373*^9, 3.608072888109948*^9}, {
+  3.608072930592375*^9, 3.608073034707885*^9}}],
+
+Cell["Create the y axis", "Text",
+ CellChangeTimes->{{3.608071993212584*^9, 3.608071997861824*^9}, {
+  3.6080724988363667`*^9, 3.608072499343769*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisStart", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {"xmid"},
+      {"ymid"},
+      {"zmid"}
+     }], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisEnd", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", GridBox[{
+       {"xmid"},
+       {"ymid"},
+       {"zmid"}
+      }], ")"}], "+", 
+    RowBox[{
+     RowBox[{"Rrpy", "[", 
+      RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+     RowBox[{"(", GridBox[{
+        {"0"},
+        {"length"},
+        {"0"}
+       }], ")"}]}]}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072009597691*^9, 3.608072147273284*^9}, {
+   3.608072227947229*^9, 3.6080722775711813`*^9}, 3.608072313156479*^9, {
+   3.608072501167762*^9, 3.608072511264971*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisStartX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisStartY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisStartZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072323993029*^9, 3.608072394334856*^9}, {
+  3.608072514658145*^9, 3.60807252246982*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisEndX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisEndY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxisEndZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"yAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6080724293047037`*^9, 3.608072449255649*^9}, {
+  3.608072524821391*^9, 3.608072537415511*^9}, {3.608073051151134*^9, 
+  3.608073053554837*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"yAxis", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Arrow", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"yAxisStartX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"yAxisStartY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"yAxisStartZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"yAxisEndX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"yAxisEndY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"yAxisEndZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.608073057521823*^9, 3.6080730670044527`*^9}}],
+
+Cell["Create the z axis", "Text",
+ CellChangeTimes->{{3.608071993212584*^9, 3.608071997861824*^9}, {
+  3.608072547234599*^9, 3.60807254752522*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisStart", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", GridBox[{
+      {"xmid"},
+      {"ymid"},
+      {"zmid"}
+     }], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisEnd", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{"(", GridBox[{
+       {"xmid"},
+       {"ymid"},
+       {"zmid"}
+      }], ")"}], "+", 
+    RowBox[{
+     RowBox[{"Rrpy", "[", 
+      RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+     RowBox[{"(", GridBox[{
+        {"0"},
+        {"0"},
+        {"length"}
+       }], ")"}]}]}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072009597691*^9, 3.608072147273284*^9}, {
+   3.608072227947229*^9, 3.6080722775711813`*^9}, 3.608072313156479*^9, {
+   3.608072549094487*^9, 3.608072557743371*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisStartX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisStartY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisStartZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisStart", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608072323993029*^9, 3.608072394334856*^9}, {
+  3.608072560258933*^9, 3.608072566483992*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisEndX", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisEndY", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxisEndZ", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"zAxisEnd", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+       "pitch", ",", "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6080724293047037`*^9, 3.608072449255649*^9}, {
+  3.608072568205618*^9, 3.608072576589349*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"zAxis", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "length_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Arrow", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"zAxisStartX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"zAxisStartY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"zAxisStartZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"zAxisEndX", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"zAxisEndY", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}], ",", 
+        RowBox[{"zAxisEndZ", "[", 
+         RowBox[{
+         "xmid", ",", "ymid", ",", "zmid", ",", "length", ",", "roll", ",", 
+          "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.608073074065343*^9, 3.608073083565469*^9}}],
+
+Cell["\<\
+Combine these functions into one command, note that this radius sets the size \
+of the axes. This is where you can change the color of the axes.\
+\>", "Text",
+ CellChangeTimes->{{3.608072852513262*^9, 3.6080728728456078`*^9}, {
+  3.6080732314726353`*^9, 3.6080732338057623`*^9}, {3.608073454279653*^9, 
+  3.608073460048019*^9}, {3.608073508565428*^9, 3.60807353171178*^9}, {
+  3.608291792965708*^9, 3.608291831898188*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RotorAxes", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "thickness_", ",", "radius_", 
+     ",", "roll_", ",", "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Rotor", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "radius", ",", 
+       "roll", ",", "pitch", ",", "yaw"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Red", ",", 
+       RowBox[{"xAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{"2", "radius"}], ",", "roll", ",", "pitch", ",", "yaw"}], 
+        "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Purple", ",", 
+       RowBox[{"yAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{"2", "radius"}], ",", "roll", ",", "pitch", ",", "yaw"}], 
+        "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Yellow", ",", 
+       RowBox[{"zAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{"2", "thickness"}], ",", "roll", ",", "pitch", ",", "yaw"}], 
+        "]"}]}], "}"}]}], "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.6080735377648*^9, 3.608073713435019*^9}, {
+  3.6080739161259413`*^9, 3.608073920965405*^9}, {3.608077741130178*^9, 
+  3.608077814149068*^9}}],
+
+Cell["Test this", "Text",
+ CellChangeTimes->{{3.608073728997542*^9, 3.608073731389325*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"RotorAxes", "[", 
+     RowBox[{
+     "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "radius", ",", 
+      "roll", ",", "pitch", ",", "yaw"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"xmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"ymid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"zmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608073733627727*^9, 3.6080737928919287`*^9}, {
+  3.608073824904956*^9, 3.608073826675873*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+    0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+    0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5, Typeset`show$$ = 
+    True, Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`xmid$$], -5, 5}, {
+      Hold[$CellContext`ymid$$], -5, 5}, {
+      Hold[$CellContext`zmid$$], -5, 5}, {
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {193., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`xmid$46035$$ = 
+    0, $CellContext`ymid$46036$$ = 0, $CellContext`zmid$46037$$ = 
+    0, $CellContext`thickness$46038$$ = 0, $CellContext`radius$46039$$ = 
+    0, $CellContext`roll$46040$$ = 0, $CellContext`pitch$46041$$ = 
+    0, $CellContext`yaw$46042$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+        0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+        0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`xmid$$, $CellContext`xmid$46035$$, 0], 
+        Hold[$CellContext`ymid$$, $CellContext`ymid$46036$$, 0], 
+        Hold[$CellContext`zmid$$, $CellContext`zmid$46037$$, 0], 
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46038$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46039$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46040$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46041$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46042$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`RotorAxes[$CellContext`xmid$$, $CellContext`ymid$$, \
+$CellContext`zmid$$, $CellContext`thickness$$, $CellContext`radius$$, \
+$CellContext`roll$$, $CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`xmid$$, -5, 
+         5}, {$CellContext`ymid$$, -5, 5}, {$CellContext`zmid$$, -5, 
+         5}, {$CellContext`thickness$$, 0, 5}, {$CellContext`radius$$, 0, 
+         5}, {$CellContext`roll$$, 0, 2 Pi}, {$CellContext`pitch$$, 0, 2 
+         Pi}, {$CellContext`yaw$$, 0, 2 Pi}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{665., {221., 227.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{{3.608073843001546*^9, 3.608073856311726*^9}, 
+   3.6080739263251257`*^9, 3.6080764736902246`*^9, {3.608077285355093*^9, 
+   3.608077293330282*^9}, 3.60807736162352*^9, 3.608077493965642*^9, 
+   3.608077538405322*^9, 3.608077656332507*^9, 3.608077777809204*^9, 
+   3.60807781917842*^9, 3.608078243240116*^9, 3.608078286686596*^9, 
+   3.608078721907881*^9, 3.608079811980744*^9, 3.6080798801418056`*^9, 
+   3.60808002577174*^9, 3.6081614291812677`*^9, 3.608291428840547*^9, 
+   3.608291481258854*^9, 3.608292381149975*^9, 3.608292453717433*^9, 
+   3.608292538160749*^9, 3.6082928728056498`*^9, 3.608292976433654*^9, 
+   3.6082935653287287`*^9, 3.608293779433867*^9, 3.608294181778138*^9, 
+   3.60829556347611*^9, 3.608295930537073*^9, 3.6082959881571407`*^9, 
+   3.608296066546054*^9, {3.608296323378977*^9, 3.608296347597459*^9}, 
+   3.6082966316092176`*^9, {3.608296666521851*^9, 3.608296680273919*^9}, {
+   3.608296739296687*^9, 3.608296761066557*^9}, {3.6082968097382097`*^9, 
+   3.608296868595571*^9}, {3.60829691083022*^9, 3.608296963576249*^9}, {
+   3.608297001751405*^9, 3.6082970479589167`*^9}, {3.6082971023286552`*^9, 
+   3.608297185947255*^9}, {3.608297218709847*^9, 3.608297269721073*^9}, 
+   3.608297346080618*^9, {3.6082974116775637`*^9, 3.608297478005116*^9}, 
+   3.608297513383586*^9, {3.6082975815990953`*^9, 3.608297639204472*^9}, 
+   3.608297792020254*^9, {3.608297884401128*^9, 3.608297905709649*^9}, {
+   3.608297940300847*^9, 3.6082979664006453`*^9}, 3.608298018832447*^9, 
+   3.608298078358758*^9, 3.608302325378025*^9, 3.6083024955417643`*^9, 
+   3.6083026371280527`*^9, 3.608302689851309*^9, 3.6083028617294283`*^9, {
+   3.608302925396531*^9, 3.608302962832713*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Graphics3D", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"RotorAxes", "[", 
+     RowBox[{"0", ",", "0", ",", "0", ",", "2", ",", "4", ",", 
+      RowBox[{"10", "\[Degree]"}], ",", 
+      RowBox[{"20", "\[Degree]"}], ",", "0"}], "]"}], ",", 
+    RowBox[{"RotorAxes", "[", 
+     RowBox[{"10", ",", "0", ",", "0", ",", "2", ",", "4", ",", 
+      RowBox[{"90", "\[Degree]"}], ",", "0", ",", "0"}], "]"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"RotorAxes", "[", 
+     RowBox[{"0", ",", "10", ",", "0", ",", "2", ",", "4", ",", "0", ",", 
+      RowBox[{"45", "\[Degree]"}], ",", 
+      RowBox[{"30", "\[Degree]"}]}], "]"}]}], "}"}], "]"}]], "Input",
+ CellChangeTimes->{{3.608074929971246*^9, 3.608074939462697*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{{
+    CylinderBox[
+     NCache[{{Cos[10 Degree] Sin[20 Degree], -Sin[10 Degree], Cos[10 Degree] 
+        Cos[20 Degree]}, {-Cos[10 Degree] Sin[20 Degree], Sin[10 Degree], -
+        Cos[10 Degree] Cos[20 Degree]}}, {{
+      0.33682408883346515`, -0.17364817766693033`, 
+      0.9254165783983234}, {-0.33682408883346515`, 
+      0.17364817766693033`, -0.9254165783983234}}], 4], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[
+      NCache[{{0, 0, 0}, {8 Cos[20 Degree], 0, (-8) Sin[20 Degree]}}, {{0, 0, 
+        0}, {7.517540966287267, 0, -2.7361611466053497`}}]]}, 
+    {RGBColor[0.5, 0, 0.5], 
+     Arrow3DBox[
+      NCache[{{0, 0, 0}, {
+        8 Sin[10 Degree] Sin[20 Degree], 8 Cos[10 Degree], 8 Cos[20 Degree] 
+         Sin[10 Degree]}}, {{0, 0, 0}, {0.4751293969110776, 7.878462024097664,
+         1.3054072893322786`}}]]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[
+      NCache[{{0, 0, 0}, {
+        4 Cos[10 Degree] Sin[20 Degree], (-4) Sin[10 Degree], 4 
+         Cos[10 Degree] Cos[20 Degree]}}, {{0, 0, 0}, {
+        1.3472963553338606`, -0.6945927106677213, 3.7016663135932935`}}]]}}, {
+    CylinderBox[{{10, -1, 0}, {10, 1, 0}}, 4], 
+    {RGBColor[1, 0, 0], Arrow3DBox[{{10, 0, 0}, {18, 0, 0}}]}, 
+    {RGBColor[0.5, 0, 0.5], Arrow3DBox[{{10, 0, 0}, {10, 0, 8}}]}, 
+    {RGBColor[1, 1, 0], Arrow3DBox[{{10, 0, 0}, {10, -4, 0}}]}}, {
+    CylinderBox[
+     NCache[{{Rational[1, 2] Rational[3, 2]^Rational[1, 2], 10 + 
+        Rational[1, 2] 2^Rational[-1, 2], 2^Rational[-1, 2]}, {
+       Rational[-1, 2] Rational[3, 2]^Rational[1, 2], 10 + 
+        Rational[-1, 2] 2^Rational[-1, 2], -2^Rational[-1, 2]}}, {{
+      0.6123724356957945, 10.353553390593273`, 
+      0.7071067811865475}, {-0.6123724356957945, 
+      9.646446609406727, -0.7071067811865475}}], 4], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[
+      NCache[{{0, 10, 0}, {
+        2 6^Rational[1, 2], 10 + 2 2^Rational[1, 2], (-4) 
+         2^Rational[1, 2]}}, {{0, 10, 0}, {4.898979485566356, 
+        12.82842712474619, -5.656854249492381}}]]}, 
+    {RGBColor[0.5, 0, 0.5], 
+     Arrow3DBox[
+      NCache[{{0, 10, 0}, {-4, 10 + 4 3^Rational[1, 2], 0}}, {{0, 10, 
+        0}, {-4, 16.928203230275507`, 0}}]]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[
+      NCache[{{0, 10, 0}, {
+        6^Rational[1, 2], 10 + 2^Rational[1, 2], 2 2^Rational[1, 2]}}, {{0, 
+        10, 0}, {2.449489742783178, 11.414213562373096`, 
+        2.8284271247461903`}}]]}}},
+  ImageSize->{360., 328.60985567598146`},
+  ViewPoint->{2.479445519257296, -2.1090006768789347`, 0.9243733347295927},
+  ViewVertical->{0.29128430089241486`, -0.20527984005505603`, 
+   1.5156319180231468`}]], "Output",
+ CellChangeTimes->{
+  3.6080764738367643`*^9, {3.6080772855310307`*^9, 3.608077293465027*^9}, 
+   3.608077361756856*^9, 3.6080774941304817`*^9, 3.608077538571168*^9, 
+   3.608077656483927*^9, 3.608077777897434*^9, 3.6080778192293177`*^9, 
+   3.608078243403199*^9, 3.6080782868552*^9, 3.6080787220822783`*^9, 
+   3.608079812133293*^9, 3.6080798802883463`*^9, 3.6080800259490757`*^9, 
+   3.608161429287407*^9, 3.608291428971034*^9, 3.6082914813102922`*^9, 
+   3.608292381269723*^9, 3.608292453930462*^9, 3.6082925382904043`*^9, 
+   3.60829287292222*^9, 3.608292976566712*^9, 3.6082935655551777`*^9, 
+   3.608293779628221*^9, 3.608294181825862*^9, 3.6082955635500517`*^9, 
+   3.60829593061604*^9, 3.6082959881879168`*^9, 3.608296066581881*^9, {
+   3.608296323458111*^9, 3.608296347633893*^9}, 3.6082966316595592`*^9, {
+   3.6082966665740547`*^9, 3.608296680322534*^9}, {3.608296739351693*^9, 
+   3.6082967611278067`*^9}, {3.6082968097957373`*^9, 3.608296868645093*^9}, {
+   3.608296910879266*^9, 3.608296963636098*^9}, {3.60829700180235*^9, 
+   3.608297048005803*^9}, {3.6082971023750763`*^9, 3.6082971859982233`*^9}, {
+   3.608297218762402*^9, 3.608297269766131*^9}, 3.608297346147457*^9, {
+   3.608297411759327*^9, 3.6082974780646973`*^9}, 3.608297513626602*^9, {
+   3.6082975818419523`*^9, 3.6082976394294577`*^9}, 3.608297792230691*^9, {
+   3.6082978844707212`*^9, 3.608297905780258*^9}, {3.608297940390348*^9, 
+   3.608297966473629*^9}, 3.608298018901802*^9, 3.608298078436529*^9, 
+   3.608302325524076*^9, 3.60830249569564*^9, 3.608302637276718*^9, 
+   3.6083026900367603`*^9, 3.60830286188412*^9, {3.608302925545998*^9, 
+   3.6083029630949707`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Make a frame for the rotors", "Subsubsection",
+ CellChangeTimes->{{3.608074964311308*^9, 3.608074973721635*^9}, {
+   3.608077838689006*^9, 3.6080778596094522`*^9}, 3.60807831769361*^9}],
+
+Cell["\<\
+Make a shape that will work for any tube with the requisite shape. I add a \
+20% buffer for the radius and the thickness. The tube thickness is 10% of the \
+thickness of the total. First, I need to define all of the points, there are \
+11.\
+\>", "Text",
+ CellChangeTimes->{{3.608075114677102*^9, 3.608075155787826*^9}, {
+  3.608075201632859*^9, 3.608075202266152*^9}, {3.6080754241699333`*^9, 
+  3.6080755157429934`*^9}, {3.608076986989794*^9, 3.6080770027075577`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point1", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{
+           RowBox[{"1.2", "radius"}], "+", "extraLength"}]},
+         {"0"},
+         {"0"}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point1X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point1Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point1Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point1", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608074948059635*^9, 3.6080749530077877`*^9}, {
+  3.6080752068290033`*^9, 3.608075250555179*^9}, {3.608075308784092*^9, 
+  3.608075363698105*^9}, {3.608075402657031*^9, 3.6080754188528643`*^9}, {
+  3.608075697289824*^9, 3.608075725946492*^9}, {3.6080757856230803`*^9, 
+  3.6080757925552063`*^9}, {3.608075961367569*^9, 3.6080761764443617`*^9}, {
+  3.608302443255088*^9, 3.6083024459268637`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point2", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"1.2", "radius"}]},
+         {"0"},
+         {"0"}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point2X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point2Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point2Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point2", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076196014367*^9, 3.6080762311266527`*^9}, {
+  3.608302684171198*^9, 3.608302685810649*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point3", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"1.2", "radius"}]},
+         {"0"},
+         {
+          RowBox[{"1.2", 
+           RowBox[{"(", 
+            RowBox[{"thickness", "/", "2"}], ")"}]}]}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point3X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point3", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point3Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point3", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point3Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point3", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076306514575*^9}, {
+  3.608302450439293*^9, 3.6083024532022552`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point4", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "1.2"}], "radius"}]},
+         {"0"},
+         {
+          RowBox[{"1.2", 
+           RowBox[{"(", 
+            RowBox[{"thickness", "/", "2"}], ")"}]}]}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point4X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point4", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point4Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point4", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point4Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point4", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076380125595*^9}, {
+  3.608302458931369*^9, 3.6083024606743193`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point5", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "1.2"}], "radius"}]},
+         {"0"},
+         {"0"}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point5X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point5", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point5Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point5", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point5Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point5", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076422973941*^9}, {
+  3.6083024659472227`*^9, 3.6083024677433033`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point6", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"1.2", "radius"}], "+", "extraLength"}], ")"}]}]},
+         {"0"},
+         {"0"}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point6X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point6", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point6Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point6", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point6Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point6", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076470054648*^9}, {
+  3.608302471275461*^9, 3.6083024742673597`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point7X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point5X", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point7Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point5Y", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point7Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point5Z", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076479756703*^9, 3.608076534939286*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point8", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "1.2"}], "radius"}]},
+         {"0"},
+         {
+          RowBox[{
+           RowBox[{"-", "1.2"}], 
+           RowBox[{"(", 
+            RowBox[{"thickness", "/", "2"}], ")"}]}]}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point8X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point8", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point8Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point8", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point8Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point8", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076380125595*^9}, {
+  3.608076659740135*^9, 3.608076684218087*^9}, {3.6083024816274757`*^9, 
+  3.608302483267201*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point9", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {"xmid"},
+        {"ymid"},
+        {"zmid"}
+       }], ")"}], "+", 
+     RowBox[{
+      RowBox[{"Rrpy", "[", 
+       RowBox[{"roll", ",", "pitch", ",", "yaw"}], "]"}], ".", 
+      RowBox[{"Rz", "[", "rotation", "]"}], ".", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"1.2", "radius"}]},
+         {"0"},
+         {
+          RowBox[{
+           RowBox[{"-", "1.2"}], 
+           RowBox[{"(", 
+            RowBox[{"thickness", "/", "2"}], ")"}]}]}
+        }], ")"}]}]}], ")"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point9X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point9", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point9Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point9", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "2", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point9Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Point9", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}], "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076239004373*^9, 3.608076306514575*^9}, {
+  3.608076740015616*^9, 3.6080767631217613`*^9}, {3.608302486935574*^9, 
+  3.608302489231336*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point10X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point2X", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point10Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point2Y", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point10Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point2Z", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.60807682944072*^9, 3.608076855928973*^9}, {
+  3.608076888207816*^9, 3.608076910830956*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point11X", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point1X", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point11Y", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point1Y", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Point11Z", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"Point1Z", "[", 
+    RowBox[{
+    "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+     ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", "yaw"}],
+     "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608076932996963*^9, 3.6080769465580187`*^9}}],
+
+Cell["Now to actually make the tube", "Text",
+ CellChangeTimes->{{3.608077014756114*^9, 3.608077023867303*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FrameForRotor", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "radius_", ",", "thickness_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", "\[IndentingNewLine]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Black", ",", 
+       RowBox[{"Tube", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point1X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point1Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point1Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point2X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point2Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point2Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], ",", 
+         RowBox[{".05", "thickness"}]}], "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Black", ",", 
+       RowBox[{"Tube", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point5X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point5Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point5Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point6X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point6Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point6Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], ",", 
+         RowBox[{"0.05", " ", "thickness"}]}], "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Green", ",", 
+       RowBox[{"Tube", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point2X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point2Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point2Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point3X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point3Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point3Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point4X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point4Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point4Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point8X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point8Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point8Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point9X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point9Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point9Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"Point10X", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point10Y", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}], ",", 
+             RowBox[{"Point10Z", "[", 
+              RowBox[{
+              "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", 
+               "rotation", ",", "radius", ",", "thickness", ",", "roll", ",", 
+               "pitch", ",", "yaw"}], "]"}]}], "}"}]}], "}"}], ",", 
+         RowBox[{"0.05", "thickness"}]}], "]"}]}], "}"}]}], "}"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.608077062227404*^9, 3.60807728998483*^9}, {
+   3.608077467843996*^9, 3.608077478655815*^9}, 3.6080775692893248`*^9, {
+   3.608077631205055*^9, 3.6080776513066883`*^9}, {3.608077935715357*^9, 
+   3.6080781291447573`*^9}, {3.608078172488481*^9, 3.6080782388068037`*^9}, 
+   3.608302625332179*^9, 3.60830267151853*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"FrameForRotor", "[", 
+     RowBox[{
+     "xmid", ",", "ymid", ",", "zmid", ",", "1", ",", "0", ",", "radius", ",",
+       "thickness", ",", "roll", ",", "pitch", ",", "yaw"}], "]"}], "]"}], 
+   ",", 
+   RowBox[{"{", 
+    RowBox[{"xmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"ymid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"zmid", ",", 
+     RowBox[{"-", "5"}], ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6080773397570457`*^9, 3.608077357615199*^9}, {
+  3.608077487682652*^9, 3.608077490680032*^9}, {3.6080775341335783`*^9, 
+  3.608077534492856*^9}, {3.608078276322332*^9, 3.608078283334424*^9}, {
+  3.608079865982348*^9, 3.608079872247081*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+    0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+    0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5, Typeset`show$$ = 
+    True, Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`xmid$$], -5, 5}, {
+      Hold[$CellContext`ymid$$], -5, 5}, {
+      Hold[$CellContext`zmid$$], -5, 5}, {
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    226., {214., 218.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`xmid$46095$$ = 
+    0, $CellContext`ymid$46096$$ = 0, $CellContext`zmid$46097$$ = 
+    0, $CellContext`thickness$46098$$ = 0, $CellContext`radius$46099$$ = 
+    0, $CellContext`roll$46100$$ = 0, $CellContext`pitch$46101$$ = 
+    0, $CellContext`yaw$46102$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+        0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`xmid$$ = -5, $CellContext`yaw$$ = 
+        0, $CellContext`ymid$$ = -5, $CellContext`zmid$$ = -5}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`xmid$$, $CellContext`xmid$46095$$, 0], 
+        Hold[$CellContext`ymid$$, $CellContext`ymid$46096$$, 0], 
+        Hold[$CellContext`zmid$$, $CellContext`zmid$46097$$, 0], 
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46098$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46099$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46100$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46101$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46102$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`FrameForRotor[$CellContext`xmid$$, $CellContext`ymid$$, \
+$CellContext`zmid$$, 1, 
+         0, $CellContext`radius$$, $CellContext`thickness$$, \
+$CellContext`roll$$, $CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`xmid$$, -5, 
+         5}, {$CellContext`ymid$$, -5, 5}, {$CellContext`zmid$$, -5, 
+         5}, {$CellContext`thickness$$, 0, 5}, {$CellContext`radius$$, 0, 
+         5}, {$CellContext`roll$$, 0, 2 Pi}, {$CellContext`pitch$$, 0, 2 
+         Pi}, {$CellContext`yaw$$, 0, 2 Pi}}, "Options" :> {}, 
+      "DefaultOptions" :> {}],
+     ImageSizeCache->{531., {242., 247.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.6080777781402473`*^9, 3.6080778195415163`*^9, 3.608078243745347*^9, 
+   3.60807828708423*^9, 3.608078722486465*^9, 3.608079812306691*^9, 
+   3.6080798805659037`*^9, 3.6080800261601343`*^9, 3.608161429484809*^9, 
+   3.608291429408224*^9, 3.608291481678917*^9, 3.6082923817696733`*^9, 
+   3.60829245445257*^9, 3.6082925387967*^9, 3.608292873358158*^9, 
+   3.608292977002314*^9, 3.6082935659803953`*^9, 3.608293780036398*^9, 
+   3.6082941821973352`*^9, 3.608295564413293*^9, 3.6082959310573997`*^9, 
+   3.608295988589714*^9, 3.608296067000086*^9, {3.608296323853135*^9, 
+   3.608296348029755*^9}, 3.6082966320614347`*^9, {3.608296666970999*^9, 
+   3.608296680741249*^9}, {3.608296739750524*^9, 3.608296761539714*^9}, {
+   3.6082968102556973`*^9, 3.608296869112479*^9}, {3.608296911353462*^9, 
+   3.608296964087552*^9}, {3.608297002254465*^9, 3.608297048527293*^9}, {
+   3.608297102870131*^9, 3.608297186614056*^9}, {3.6082972193620243`*^9, 
+   3.608297270389889*^9}, 3.608297346715025*^9, {3.6082974123586283`*^9, 
+   3.6082974787071333`*^9}, 3.608297514147644*^9, {3.608297582308484*^9, 
+   3.608297639906904*^9}, 3.6082977927810383`*^9, {3.608297885286276*^9, 
+   3.608297906594213*^9}, {3.6082979412484283`*^9, 3.608297967372424*^9}, 
+   3.6082980200144*^9, 3.608298079519508*^9, 3.608302326044945*^9, 
+   3.608302496371921*^9, 3.608302638164716*^9, 3.608302690620347*^9, 
+   3.60830286238278*^9, {3.6083029271561413`*^9, 3.608302963757719*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Functions for rotors with frames for both with and without rotors\
+\>", "Subsubsection",
+ CellChangeTimes->{{3.608078330233844*^9, 3.608078380847825*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RotorFrame", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "thickness_", ",", "radius_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Rotor", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "radius", ",", 
+       "roll", ",", "pitch", ",", "yaw"}], "]"}], ",", 
+     RowBox[{"FrameForRotor", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}]}], "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608078384118226*^9, 3.608078393750256*^9}, {
+  3.6080784453978567`*^9, 3.6080785509271507`*^9}, {3.608078637657933*^9, 
+  3.608078677704982*^9}, {3.608293360062155*^9, 3.608293361696484*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RotorFrameAxes", "[", 
+    RowBox[{
+    "xmid_", ",", "ymid_", ",", "zmid_", ",", "extraLength_", ",", 
+     "rotation_", ",", "thickness_", ",", "radius_", ",", "roll_", ",", 
+     "pitch_", ",", "yaw_"}], "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Rotor", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "thickness", ",", "radius", ",", 
+       "roll", ",", "pitch", ",", "yaw"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Red", ",", 
+       RowBox[{"xAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{
+          RowBox[{"2", "radius"}], "+", 
+          RowBox[{"1.5", "extraLength"}]}], ",", "roll", ",", "pitch", ",", 
+         "yaw"}], "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Purple", ",", 
+       RowBox[{"yAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{
+          RowBox[{"2", "radius"}], "+", 
+          RowBox[{"1.5", "extraLength"}]}], ",", "roll", ",", "pitch", ",", 
+         "yaw"}], "]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"Yellow", ",", 
+       RowBox[{"zAxis", "[", 
+        RowBox[{"xmid", ",", "ymid", ",", "zmid", ",", 
+         RowBox[{"3", "thickness"}], ",", "roll", ",", "pitch", ",", "yaw"}], 
+        "]"}]}], "}"}], ",", 
+     RowBox[{"FrameForRotor", "[", 
+      RowBox[{
+      "xmid", ",", "ymid", ",", "zmid", ",", "extraLength", ",", "rotation", 
+       ",", "radius", ",", "thickness", ",", "roll", ",", "pitch", ",", 
+       "yaw"}], "]"}]}], "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.6080787058702517`*^9, 3.608078715365457*^9}, {
+  3.608079972676434*^9, 3.6080800176391973`*^9}, {3.608293365577323*^9, 
+  3.608293367913147*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Instructions and Examples", "Section",
+ CellChangeTimes->{{3.608291460682905*^9, 3.60829146683281*^9}}],
+
+Cell["\<\
+Before attempting to generate figures, you should evaluate this entire \
+notebook to ensure that all of the required functions are present. Note that \
+this notebook will remove all previously stored variables and functions, so \
+be sure to save prior work before running this function. To remove the boxes \
+around the figures, use the Boxed\[Rule]False command within Graphics3D.\
+\>", "Text",
+ CellChangeTimes->{{3.608291498438756*^9, 3.608291515006241*^9}, {
+  3.608291563514328*^9, 3.6082916738159657`*^9}, {3.6082945163931103`*^9, 
+  3.608294543764472*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["How to use the functions", "Subsection",
+ CellChangeTimes->{{3.608291685737825*^9, 3.60829170044823*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Create a Rotor by itself", "Subsubsection",
+ CellChangeTimes->{{3.608291711989855*^9, 3.608291735568715*^9}}],
+
+Cell["\<\
+The function to create a rotor by itself is \
+Rotor[xmid,ymid,zmid,thickness,radius,roll,pitch,yaw]. This essentailly \
+creates a cylinder with the desired characteristics. The inputs to this \
+function are\
+\>", "Text",
+ CellChangeTimes->{{3.608291742618066*^9, 3.608291761681476*^9}, {
+  3.608291842826627*^9, 3.6082918880070257`*^9}, {3.608291950086192*^9, 
+  3.60829195413975*^9}, {3.608292006997628*^9, 3.6082920189368877`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+xmid: the x-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292079141595*^9}}],
+
+Cell["\<\
+ymid: the y-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292096147729*^9}}],
+
+Cell["\<\
+zmid: the z-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}}],
+
+Cell["\<\
+thickness: the thickness of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292130831903*^9}}],
+
+Cell["\<\
+radius: the radius of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292139032037*^9}}],
+
+Cell["\<\
+roll: the roll angle in radians. This represents the first Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829220959144*^9}}],
+
+Cell["\<\
+pitch: the pitch angle in radians. This represents the second Euler angle in \
+a 1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829223190971*^9}}],
+
+Cell["\<\
+yaw: the yaw angle in radians. This represents the third Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082922521441298`*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ "An example of how this function is used is shown below. Note that the xmid, \
+ymid, and zmid variables are not varied because ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " automatically repositions the camera."
+}], "Text",
+ CellChangeTimes->{{3.608292269985614*^9, 3.608292341457468*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"Rotor", "[", 
+     RowBox[{
+     "0", ",", "0", ",", "0", ",", "thickness", ",", "radius", ",", "roll", 
+      ",", "pitch", ",", "yaw"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608292360052786*^9, 3.608292375375606*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+    0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`yaw$$ = 0, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {193., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`thickness$46153$$ = 
+    0, $CellContext`radius$46154$$ = 0, $CellContext`roll$46155$$ = 
+    0, $CellContext`pitch$46156$$ = 0, $CellContext`yaw$46157$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+        0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`yaw$$ = 0}, "ControllerVariables" :> {
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46153$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46154$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46155$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46156$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46157$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`Rotor[
+        0, 0, 0, $CellContext`thickness$$, $CellContext`radius$$, \
+$CellContext`roll$$, $CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`thickness$$, 0, 
+         5}, {$CellContext`radius$$, 0, 5}, {$CellContext`roll$$, 0, 2 
+         Pi}, {$CellContext`pitch$$, 0, 2 Pi}, {$CellContext`yaw$$, 0, 2 Pi}},
+       "Options" :> {}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {293., 298.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.608292382083214*^9, 3.608292454684382*^9, 3.608292539027767*^9, 
+   3.608292873616046*^9, 3.608292977243499*^9, 3.6082935661773663`*^9, 
+   3.608293780233932*^9, 3.608294182310938*^9, 3.608295564584605*^9, 
+   3.6082959311696787`*^9, 3.6082959886917067`*^9, 3.608296067116179*^9, {
+   3.6082963240037127`*^9, 3.6082963481519814`*^9}, 3.608296632179042*^9, {
+   3.608296667087666*^9, 3.608296680843288*^9}, {3.608296739867467*^9, 
+   3.608296761626087*^9}, {3.608296810371114*^9, 3.6082968692299843`*^9}, {
+   3.608296911474846*^9, 3.608296964200451*^9}, {3.608297002388698*^9, 
+   3.6082970486807547`*^9}, {3.608297103068828*^9, 3.6082971867835608`*^9}, {
+   3.6082972195215187`*^9, 3.608297270525487*^9}, 3.608297346913165*^9, {
+   3.60829741252358*^9, 3.608297478851488*^9}, 3.608297514313651*^9, {
+   3.60829758249469*^9, 3.608297640031209*^9}, 3.6082977929259*^9, {
+   3.608297885440131*^9, 3.6082979067471733`*^9}, {3.608297941505206*^9, 
+   3.6082979675659447`*^9}, 3.608298020402747*^9, 3.608298079883461*^9, 
+   3.608302326273755*^9, 3.608302496766448*^9, 3.6083026392996407`*^9, 
+   3.608302692062982*^9, 3.6083028628501368`*^9, {3.6083029275900297`*^9, 
+   3.60830296403389*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Create a Rotor with Axes", "Subsubsection",
+ CellChangeTimes->{{3.608291711989855*^9, 3.608291735568715*^9}, {
+  3.608292551329389*^9, 3.608292559472436*^9}}],
+
+Cell["\<\
+The function to create a rotor by itself is \
+RotorAxes[xmid,ymid,zmid,thickness,radius,roll,pitch,yaw]. This essentailly \
+creates a cylinder with the desired characteristics and colorized axes. The \
+color of the axes are red (x, roll), purple (y, pitch), and yellow (z, yaw). \
+To change the color of the axes, modify the appropriate function in the \
+\[OpenCurlyDoubleQuote]Functions for generating \
+shapes\[CloseCurlyDoubleQuote] section.  Note that is assumed that the 3-axis \
+is the spin axis of the rotor. This can be changed by recoloring the axes. \
+The inputs to this function are\
+\>", "Text",
+ CellChangeTimes->{{3.608291742618066*^9, 3.608291761681476*^9}, {
+  3.608291842826627*^9, 3.6082918880070257`*^9}, {3.608291950086192*^9, 
+  3.60829195413975*^9}, {3.608292006997628*^9, 3.6082920189368877`*^9}, {
+  3.608292571771722*^9, 3.608292669734425*^9}, {3.608292885078154*^9, 
+  3.608292970922409*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+xmid: the x-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292079141595*^9}}],
+
+Cell["\<\
+ymid: the y-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292096147729*^9}}],
+
+Cell["\<\
+zmid: the z-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}}],
+
+Cell["\<\
+thickness: the thickness of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292130831903*^9}}],
+
+Cell["\<\
+radius: the radius of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292139032037*^9}}],
+
+Cell["\<\
+roll: the roll angle in radians. This represents the first Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829220959144*^9}}],
+
+Cell["\<\
+pitch: the pitch angle in radians. This represents the second Euler angle in \
+a 1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829223190971*^9}}],
+
+Cell["\<\
+yaw: the yaw angle in radians. This represents the third Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082922521441298`*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ "An example of how this function is used is shown below. Note that the xmid, \
+ymid, and zmid variables are not varied because ",
+ StyleBox["Mathema tica",
+  FontSlant->"Italic"],
+ " automatically repositions the camera."
+}], "Text",
+ CellChangeTimes->{{3.608292269985614*^9, 3.608292341457468*^9}, 
+   3.608292859902679*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"RotorAxes", "[", 
+     RowBox[{
+     "0", ",", "0", ",", "0", ",", "thickness", ",", "radius", ",", "roll", 
+      ",", "pitch", ",", "yaw"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608292360052786*^9, 3.608292375375606*^9}, {
+  3.6082928668145123`*^9, 3.608292867931034*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+    0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`yaw$$ = 0, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {193., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`thickness$46196$$ = 
+    0, $CellContext`radius$46197$$ = 0, $CellContext`roll$46198$$ = 
+    0, $CellContext`pitch$46199$$ = 0, $CellContext`yaw$46200$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`pitch$$ = 0, $CellContext`radius$$ = 
+        0, $CellContext`roll$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`yaw$$ = 0}, "ControllerVariables" :> {
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46196$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46197$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46198$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46199$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46200$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`RotorAxes[
+        0, 0, 0, $CellContext`thickness$$, $CellContext`radius$$, \
+$CellContext`roll$$, $CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`thickness$$, 0, 
+         5}, {$CellContext`radius$$, 0, 5}, {$CellContext`roll$$, 0, 2 
+         Pi}, {$CellContext`pitch$$, 0, 2 Pi}, {$CellContext`yaw$$, 0, 2 Pi}},
+       "Options" :> {}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {293., 298.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.608292382083214*^9, 3.608292454684382*^9, 3.608292539027767*^9, 
+   3.608292873692301*^9, 3.608292977322391*^9, 3.6082935663615932`*^9, 
+   3.6082937803584414`*^9, 3.608294182414905*^9, 3.608295564707725*^9, 
+   3.6082959312768307`*^9, 3.608295988795154*^9, 3.608296067223714*^9, {
+   3.6082963241274233`*^9, 3.6082963482567244`*^9}, 3.6082966322895927`*^9, {
+   3.6082966672002907`*^9, 3.608296680953274*^9}, {3.60829673997836*^9, 
+   3.6082967617637672`*^9}, {3.608296810482671*^9, 3.608296869341662*^9}, {
+   3.608296911588326*^9, 3.60829696431247*^9}, {3.6082970024989653`*^9, 
+   3.608297048789185*^9}, {3.608297103205288*^9, 3.6082971869297323`*^9}, {
+   3.608297219648245*^9, 3.6082972706352043`*^9}, 3.608297347033546*^9, {
+   3.608297412659555*^9, 3.608297478961323*^9}, 3.6082975144211082`*^9, {
+   3.6082975826036673`*^9, 3.6082976401958*^9}, 3.608297793062776*^9, {
+   3.608297885552258*^9, 3.608297906884568*^9}, {3.608297941616734*^9, 
+   3.608297967688393*^9}, 3.608298020555828*^9, 3.608298080033615*^9, 
+   3.608302326474626*^9, 3.608302496890382*^9, 3.6083026405540037`*^9, 
+   3.6083026938794813`*^9, 3.608302862972453*^9, {3.60830292773911*^9, 
+   3.608302964168861*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Create a Rotor with a frame", "Subsubsection",
+ CellChangeTimes->{{3.608291711989855*^9, 3.608291735568715*^9}, {
+  3.6082932891478577`*^9, 3.608293293314824*^9}}],
+
+Cell["\<\
+The function to create a rotor by itself is \
+RotorFrame[xmid,ymid,zmid,extraLength,rotation,thickness,radius,roll,pitch,\
+yaw]. This creates a rotor with a simple frame that represents the attachment \
+to a spacecraft The inputs to this function are\
+\>", "Text",
+ CellChangeTimes->{{3.608291742618066*^9, 3.608291761681476*^9}, {
+  3.608291842826627*^9, 3.6082918880070257`*^9}, {3.608291950086192*^9, 
+  3.60829195413975*^9}, {3.608292006997628*^9, 3.6082920189368877`*^9}, {
+  3.608293306195225*^9, 3.6082933325794697`*^9}, {3.608293380397958*^9, 
+  3.6082934010444193`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+xmid: the x-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292079141595*^9}}],
+
+Cell["\<\
+ymid: the y-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292096147729*^9}}],
+
+Cell["\<\
+zmid: the z-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.608293406006362*^9}}],
+
+Cell["\<\
+extraLength: the length of the \[OpenCurlyDoubleQuote]arms\
+\[CloseCurlyDoubleQuote] of the frame\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.6082934224618397`*^9}}],
+
+Cell["\<\
+rotation: position of the frame with respect to the x-axis. Represented by an \
+angle in radians. By default the frame is aligned with the x-axis\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.608293491049511*^9}}],
+
+Cell["\<\
+thickness: the thickness of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292130831903*^9}}],
+
+Cell["\<\
+radius: the radius of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292139032037*^9}}],
+
+Cell["\<\
+roll: the roll angle in radians. This represents the first Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829220959144*^9}}],
+
+Cell["\<\
+pitch: the pitch angle in radians. This represents the second Euler angle in \
+a 1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829223190971*^9}}],
+
+Cell["\<\
+yaw: the yaw angle in radians. This represents the third Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082922521441298`*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ "An example of how this function is used is shown below. Note that the xmid, \
+ymid, and zmid variables are not varied because ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " automatically repositions the camera."
+}], "Text",
+ CellChangeTimes->{{3.608292269985614*^9, 3.608292341457468*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{"RotorFrame", "[", 
+     RowBox[{
+     "0", ",", "5", ",", "0", ",", "extraLength", ",", "rotation", ",", 
+      "thickness", ",", "radius", ",", "roll", ",", "pitch", ",", "yaw"}], 
+     "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"extraLength", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"rotation", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608292360052786*^9, 3.608292375375606*^9}, {
+  3.608293515575871*^9, 3.608293556592422*^9}, {3.608296030509408*^9, 
+  3.608296030723291*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`extraLength$$ = 0, $CellContext`pitch$$ = 
+    0, $CellContext`radius$$ = 0, $CellContext`roll$$ = 
+    0, $CellContext`rotation$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`yaw$$ = 0, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`extraLength$$], 0, 5}, {
+      Hold[$CellContext`rotation$$], 0, 2 Pi}, {
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {198., 202.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`extraLength$46239$$ = 
+    0, $CellContext`rotation$46240$$ = 0, $CellContext`thickness$46241$$ = 
+    0, $CellContext`radius$46242$$ = 0, $CellContext`roll$46243$$ = 
+    0, $CellContext`pitch$46244$$ = 0, $CellContext`yaw$46245$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`extraLength$$ = 0, $CellContext`pitch$$ = 
+        0, $CellContext`radius$$ = 0, $CellContext`roll$$ = 
+        0, $CellContext`rotation$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`yaw$$ = 0}, "ControllerVariables" :> {
+        Hold[$CellContext`extraLength$$, $CellContext`extraLength$46239$$, 0], 
+        Hold[$CellContext`rotation$$, $CellContext`rotation$46240$$, 0], 
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46241$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46242$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46243$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46244$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46245$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`RotorFrame[
+        0, 5, 0, $CellContext`extraLength$$, $CellContext`rotation$$, \
+$CellContext`thickness$$, $CellContext`radius$$, $CellContext`roll$$, \
+$CellContext`pitch$$, $CellContext`yaw$$]], 
+      "Specifications" :> {{$CellContext`extraLength$$, 0, 
+         5}, {$CellContext`rotation$$, 0, 2 Pi}, {$CellContext`thickness$$, 0,
+          5}, {$CellContext`radius$$, 0, 5}, {$CellContext`roll$$, 0, 2 
+         Pi}, {$CellContext`pitch$$, 0, 2 Pi}, {$CellContext`yaw$$, 0, 2 Pi}},
+       "Options" :> {}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {326., 331.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.608292382083214*^9, 3.608292454684382*^9, 3.608292539027767*^9, 
+   3.608292873616046*^9, 3.608292977243499*^9, 3.608293566455286*^9, 
+   3.608293780557746*^9, 3.608294182525982*^9, 3.608295564860548*^9, 
+   3.6082959313784027`*^9, 3.608295988921135*^9, 3.608296032426605*^9, 
+   3.608296067344886*^9, {3.6082963242524757`*^9, 3.6082963483851852`*^9}, 
+   3.608296632408245*^9, {3.608296667317994*^9, 3.6082966810828867`*^9}, {
+   3.608296740115973*^9, 3.608296761883572*^9}, {3.6082968106292343`*^9, 
+   3.608296869471363*^9}, {3.608296911705636*^9, 3.608296964425943*^9}, {
+   3.6082970026169662`*^9, 3.6082970489228487`*^9}, {3.608297103321549*^9, 
+   3.608297187128714*^9}, {3.6082972197673883`*^9, 3.608297270765337*^9}, 
+   3.6082973471696043`*^9, {3.608297412793663*^9, 3.608297479162249*^9}, 
+   3.608297514698167*^9, {3.6082975828984833`*^9, 3.60829764045725*^9}, 
+   3.608297793384211*^9, {3.608297885671419*^9, 3.6082979070407352`*^9}, {
+   3.608297941986348*^9, 3.6082979678057327`*^9}, 3.6082980207120447`*^9, 
+   3.608298080184257*^9, 3.608302326631398*^9, 3.6083024975063257`*^9, 
+   3.608302640806946*^9, 3.608302694386468*^9, 3.608302863110873*^9, {
+   3.6083029279177723`*^9, 3.6083029643480797`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Create a Rotor with a frame and axes\
+\>", "Subsubsection",
+ CellChangeTimes->{{3.608291711989855*^9, 3.608291735568715*^9}, {
+  3.6082932891478577`*^9, 3.608293293314824*^9}, {3.6082937096858892`*^9, 
+  3.608293711648706*^9}}],
+
+Cell["\<\
+The function to create a rotor by itself is \
+RotorFrameAxes[xmid,ymid,zmid,extraLength,rotation,thickness,radius,roll,\
+pitch,yaw]. This creates a rotor with colorized axes and a simple frame that \
+represents the attachment to a spacecraft.  The color of the axes are red (x, \
+roll), purple (y, pitch), and yellow (z, yaw). To change the color of the \
+axes, modify the appropriate function in the \[OpenCurlyDoubleQuote]Functions \
+for generating shapes\[CloseCurlyDoubleQuote] section.  Note that is assumed \
+that the 3-axis is the spin axis of the rotor. This can be changed by \
+recoloring the axes.  The inputs to this function are\
+\>", "Text",
+ CellChangeTimes->{{3.608291742618066*^9, 3.608291761681476*^9}, {
+  3.608291842826627*^9, 3.6082918880070257`*^9}, {3.608291950086192*^9, 
+  3.60829195413975*^9}, {3.608292006997628*^9, 3.6082920189368877`*^9}, {
+  3.608293306195225*^9, 3.6082933325794697`*^9}, {3.608293380397958*^9, 
+  3.6082934010444193`*^9}, {3.608293720353032*^9, 3.608293770805831*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+xmid: the x-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292079141595*^9}}],
+
+Cell["\<\
+ymid: the y-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292096147729*^9}}],
+
+Cell["\<\
+zmid: the z-coordinate of the midpoint of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.608293406006362*^9}}],
+
+Cell["\<\
+extraLength: the length of the \[OpenCurlyDoubleQuote]arms\
+\[CloseCurlyDoubleQuote] of the frame\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.6082934224618397`*^9}}],
+
+Cell["\<\
+rotation: position of the frame with respect to the x-axis. Represented by an \
+angle in radians. By default the frame is aligned with the x-axis\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082921085956287`*^9}, {
+  3.608293406004436*^9, 3.608293491049511*^9}}],
+
+Cell["\<\
+thickness: the thickness of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292130831903*^9}}],
+
+Cell["\<\
+radius: the radius of the rotor\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.608292139032037*^9}}],
+
+Cell["\<\
+roll: the roll angle in radians. This represents the first Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829220959144*^9}}],
+
+Cell["\<\
+pitch: the pitch angle in radians. This represents the second Euler angle in \
+a 1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.60829223190971*^9}}],
+
+Cell["\<\
+yaw: the yaw angle in radians. This represents the third Euler angle in a \
+1-2-3 rotation, i.e. a RPY rotation.\
+\>", "Item",
+ CellChangeTimes->{{3.6082920527144957`*^9, 3.6082922521441298`*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ "An example of how this function is used is shown below. Note that the xmid, \
+ymid, and zmid variables are not varied because ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " automatically repositions the camera."
+}], "Text",
+ CellChangeTimes->{{3.608292269985614*^9, 3.608292341457468*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Manipulate", "[", 
+  RowBox[{
+   RowBox[{"Graphics3D", "[", 
+    RowBox[{
+     RowBox[{"RotorFrameAxes", "[", 
+      RowBox[{
+      "0", ",", "0", ",", "0", ",", "extraLength", ",", "rotation", ",", 
+       "thickness", ",", "radius", ",", "roll", ",", "pitch", ",", "yaw"}], 
+      "]"}], ",", 
+     RowBox[{"Boxed", "\[Rule]", "False"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"extraLength", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"rotation", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"thickness", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"radius", ",", "0", ",", "5"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"roll", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"pitch", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"yaw", ",", "0", ",", 
+     RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608292360052786*^9, 3.608292375375606*^9}, {
+  3.608293515575871*^9, 3.608293556592422*^9}, {3.608293723971162*^9, 
+  3.608293725484186*^9}, {3.608294279120489*^9, 3.608294284550126*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`extraLength$$ = 0, $CellContext`pitch$$ = 
+    0, $CellContext`radius$$ = 0, $CellContext`roll$$ = 
+    0, $CellContext`rotation$$ = 0, $CellContext`thickness$$ = 
+    0, $CellContext`yaw$$ = 0, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`extraLength$$], 0, 5}, {
+      Hold[$CellContext`rotation$$], 0, 2 Pi}, {
+      Hold[$CellContext`thickness$$], 0, 5}, {
+      Hold[$CellContext`radius$$], 0, 5}, {
+      Hold[$CellContext`roll$$], 0, 2 Pi}, {
+      Hold[$CellContext`pitch$$], 0, 2 Pi}, {
+      Hold[$CellContext`yaw$$], 0, 2 Pi}}, Typeset`size$$ = {
+    360., {193., 198.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`extraLength$46292$$ = 
+    0, $CellContext`rotation$46293$$ = 0, $CellContext`thickness$46294$$ = 
+    0, $CellContext`radius$46295$$ = 0, $CellContext`roll$46296$$ = 
+    0, $CellContext`pitch$46297$$ = 0, $CellContext`yaw$46298$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, 
+      "Variables" :> {$CellContext`extraLength$$ = 0, $CellContext`pitch$$ = 
+        0, $CellContext`radius$$ = 0, $CellContext`roll$$ = 
+        0, $CellContext`rotation$$ = 0, $CellContext`thickness$$ = 
+        0, $CellContext`yaw$$ = 0}, "ControllerVariables" :> {
+        Hold[$CellContext`extraLength$$, $CellContext`extraLength$46292$$, 0], 
+        Hold[$CellContext`rotation$$, $CellContext`rotation$46293$$, 0], 
+        Hold[$CellContext`thickness$$, $CellContext`thickness$46294$$, 0], 
+        Hold[$CellContext`radius$$, $CellContext`radius$46295$$, 0], 
+        Hold[$CellContext`roll$$, $CellContext`roll$46296$$, 0], 
+        Hold[$CellContext`pitch$$, $CellContext`pitch$46297$$, 0], 
+        Hold[$CellContext`yaw$$, $CellContext`yaw$46298$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> Graphics3D[
+        $CellContext`RotorFrameAxes[
+        0, 0, 0, $CellContext`extraLength$$, $CellContext`rotation$$, \
+$CellContext`thickness$$, $CellContext`radius$$, $CellContext`roll$$, \
+$CellContext`pitch$$, $CellContext`yaw$$], Boxed -> False], 
+      "Specifications" :> {{$CellContext`extraLength$$, 0, 
+         5}, {$CellContext`rotation$$, 0, 2 Pi}, {$CellContext`thickness$$, 0,
+          5}, {$CellContext`radius$$, 0, 5}, {$CellContext`roll$$, 0, 2 
+         Pi}, {$CellContext`pitch$$, 0, 2 Pi}, {$CellContext`yaw$$, 0, 2 Pi}},
+       "Options" :> {}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {321., 326.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.6082941827344637`*^9, 3.6082942858307123`*^9, 3.608295565241865*^9, 
+   3.608295931498011*^9, 3.60829598906109*^9, 3.608296067478595*^9, {
+   3.608296324380505*^9, 3.608296348514572*^9}, 3.6082966325409527`*^9, {
+   3.608296667451185*^9, 3.6082966812161303`*^9}, {3.608296740262865*^9, 
+   3.608296762039423*^9}, {3.608296810765317*^9, 3.608296869606094*^9}, {
+   3.608296911840866*^9, 3.608296964550166*^9}, {3.608297002750605*^9, 
+   3.608297049125511*^9}, {3.6082971034718523`*^9, 3.608297187400345*^9}, {
+   3.608297220100245*^9, 3.60829727106243*^9}, 3.608297347484208*^9, {
+   3.6082974130809517`*^9, 3.608297479438451*^9}, 3.6082975148780823`*^9, {
+   3.608297583077289*^9, 3.6082976405960503`*^9}, 3.608297793532813*^9, {
+   3.608297885829862*^9, 3.6082979072072353`*^9}, {3.60829794214765*^9, 
+   3.60829796807992*^9}, 3.608298020880621*^9, 3.608298080357026*^9, 
+   3.608302326821328*^9, 3.6083024987408943`*^9, 3.608302641187545*^9, 
+   3.6083026946541557`*^9, 3.608302863269924*^9, {3.6083029281015787`*^9, 
+   3.60830296462502*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Examples", "Subsection",
+ CellChangeTimes->{{3.60829455380799*^9, 3.608294556580645*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Pyramid Configuration", "Subsubsection",
+ CellChangeTimes->{{3.608294563070154*^9, 3.608294569400806*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleRadius", "=", "3"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleThickness", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleExtraLength", "=", "1"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleIncidenceAngle", "=", 
+   RowBox[{"35", "\[Degree]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608295106934948*^9, 3.608295162218173*^9}, {
+   3.6082953135333977`*^9, 3.60829533149728*^9}, 3.608297989000011*^9, {
+   3.608302920923979*^9, 3.608302957619804*^9}}],
+
+Cell["CMG 1", "Text",
+ CellChangeTimes->{{3.6082956269729757`*^9, 3.6082956280404253`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1xmid", "=", "7"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1ymid", "=", "0"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1zmid", "=", "0"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608295174670871*^9, 3.6082952145429068`*^9}, {
+  3.608298073788381*^9, 3.608298073955173*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1roll", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1pitch", "=", 
+   RowBox[{
+    RowBox[{"90", "\[Degree]"}], "+", "PyramidExampleIncidenceAngle"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1yaw", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1rotation", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6082952813565893`*^9, 3.608295283155518*^9}, {
+  3.6082953381764793`*^9, 3.608295342960499*^9}, {3.6082955117206984`*^9, 
+  3.608295557359346*^9}, {3.6082956715933857`*^9, 3.6082956867901497`*^9}, {
+  3.608295856452222*^9, 3.6082958597398787`*^9}, {3.6082959155967827`*^9, 
+  3.6082959260369387`*^9}, {3.608297444764071*^9, 3.608297450090846*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG1", "=", 
+   RowBox[{"RotorFrameAxes", "[", 
+    RowBox[{
+    "PyramidExampleCMG1xmid", ",", "PyramidExampleCMG1ymid", ",", 
+     "PyramidExampleCMG1zmid", ",", "PyramidExampleExtraLength", ",", 
+     "PyramidExampleCMG1rotation", ",", "PyramidExampleThickness", ",", 
+     "PyramidExampleRadius", ",", "PyramidExampleCMG1roll", ",", 
+     "PyramidExampleCMG1pitch", ",", "PyramidExampleCMG1yaw"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Graphics3D", "[", "PyramidExampleCMG1", "]"}]}], "Input",
+ CellChangeTimes->{{3.60829558136926*^9, 3.608295595542818*^9}, {
+  3.608295632100564*^9, 3.608295773908864*^9}, {3.6082960557370043`*^9, 
+  3.6082960626633043`*^9}, {3.608302719153933*^9, 3.6083027198443823`*^9}, {
+  3.6083027766848383`*^9, 3.6083027998960342`*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   CylinderBox[
+    NCache[{{7 + Rational[1, 2] Cos[35 Degree], 0, Rational[-1, 2] 
+       Sin[35 Degree]}, {
+      7 + Rational[-1, 2] Cos[35 Degree], 0, Rational[1, 2] 
+       Sin[35 Degree]}}, {{7.4095760221444955`, 0, -0.286788218175523}, {
+      6.5904239778555045`, 0, 0.286788218175523}}], 3], 
+   {RGBColor[1, 0, 0], 
+    Arrow3DBox[{{7, 0, 0}, {2.698176727367155, 0., -6.143640332167439}}]}, 
+   {RGBColor[0.5, 0, 0.5], Arrow3DBox[{{7, 0, 0}, {7., 7.5, 0.}}]}, 
+   {RGBColor[1, 1, 0], 
+    Arrow3DBox[
+     NCache[{{7, 0, 0}, {7 + 3 Cos[35 Degree], 0, (-3) Sin[35 Degree]}}, {{7, 
+       0, 0}, {9.457456132866975, 0, -1.7207293090531381`}}]]}, {
+    {GrayLevel[0], 
+     TubeBox[{{4.361548392785188, 0., -3.768099403729362}, {4.935124829136234,
+       0., -2.9489473594403703`}}, 0.05]}, 
+    {GrayLevel[0], 
+     TubeBox[{{9.064875170863765, 0., 2.9489473594403703`}, {
+      9.638451607214812, 0., 3.768099403729362}}, 0.05]}, 
+    {RGBColor[0, 1, 0], 
+     TubeBox[{{4.935124829136234, 0., -2.9489473594403703`}, {
+      5.426616055709629, 0., -3.293093221250998}, {9.55636639743716, 0., 
+      2.604801497629743}, {8.57338394429037, 0., 3.293093221250998}, {
+      4.44363360256284, 0., -2.604801497629743}, {4.935124829136234, 
+      0., -2.9489473594403703`}}, 0.05]}}},
+  AutomaticImageSize->True,
+  ImageSize->{332.0377484933998, 307.1649467985236},
+  ViewPoint->{-0.5570812111464928, 3.207556129474687, 0.9226289614232409},
+  ViewVertical->{-0.4128222015423624, 0.3864583958077735, 
+   1.617693034579213}]], "Output",
+ CellChangeTimes->{
+  3.608295989303452*^9, 3.608296067731782*^9, {3.6082963245824013`*^9, 
+   3.608296348713767*^9}, 3.608296632756995*^9, {3.608296667666999*^9, 
+   3.6082966814203053`*^9}, {3.6082967404613543`*^9, 3.608296762252345*^9}, {
+   3.6082968109661427`*^9, 3.608296869841193*^9}, {3.608296912077091*^9, 
+   3.608296964778038*^9}, {3.6082970029797077`*^9, 3.608297049473969*^9}, {
+   3.6082971038702517`*^9, 3.608297187751264*^9}, {3.608297220348713*^9, 
+   3.608297271324914*^9}, 3.608297347873208*^9, {3.6082974133324547`*^9, 
+   3.608297479699464*^9}, 3.6082975151220083`*^9, {3.608297583371159*^9, 
+   3.608297640914542*^9}, 3.608297793859373*^9, {3.6082978862670393`*^9, 
+   3.608297907646879*^9}, {3.60829794256804*^9, 3.60829796837603*^9}, 
+   3.608298021396883*^9, 3.608298080889237*^9, 3.608302327133087*^9, 
+   3.608302499160461*^9, 3.608302641716978*^9, 3.6083026950679903`*^9, 
+   3.608302864029106*^9, {3.60830292853736*^9, 3.608302964978271*^9}}]
+}, Open  ]],
+
+Cell["CMG 2", "Text",
+ CellChangeTimes->{{3.6082956269729757`*^9, 3.6082956280404253`*^9}, {
+  3.608296230529155*^9, 3.60829623070415*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2xmid", "=", "0"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2ymid", "=", "7"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2zmid", "=", "0"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608295174670871*^9, 3.6082952145429068`*^9}, {
+  3.608296233321249*^9, 3.6082962351931753`*^9}, {3.608296292786252*^9, 
+  3.608296295649993*^9}, {3.6082967348104057`*^9, 3.608296757740395*^9}, {
+  3.6082980694049387`*^9, 3.608298069683247*^9}}],
+
+Cell["Some scratch work", "Text",
+ CellChangeTimes->{{3.608296407056615*^9, 3.608296410950754*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2rotationMatrix", "=", 
+   RowBox[{
+    RowBox[{"Rx", "[", 
+     RowBox[{"(", 
+      RowBox[{"PyramidExampleIncidenceAngle", "-", 
+       RowBox[{"90", "\[Degree]"}]}], ")"}], "]"}], ".", 
+    RowBox[{"Rz", "[", 
+     RowBox[{"90", "\[Degree]"}], "]"}], ".", 
+    RowBox[{"Ry", "[", 
+     RowBox[{"89.9999999999999", "\[Degree]"}], "]"}]}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608296428624057*^9, 3.608296475900834*^9}, {
+  3.608296663080711*^9, 3.608296677296843*^9}, {3.608296787258505*^9, 
+  3.608297044796633*^9}, {3.608297094895246*^9, 3.608297181906649*^9}, {
+  3.608297215020464*^9, 3.608297265660041*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2roll", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+       RowBox[{"[", "2", "]"}], "]"}], "[", 
+      RowBox[{"[", "1", "]"}], "]"}], ",", 
+     RowBox[{
+      RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+       RowBox[{"[", "1", "]"}], "]"}], "[", 
+      RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2pitch", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{"-", 
+      RowBox[{
+       RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+        RowBox[{"[", "3", "]"}], "]"}], "[", 
+       RowBox[{"[", "1", "]"}], "]"}]}], ",", 
+     SqrtBox[
+      RowBox[{
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "2"], "+", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], "[", 
+         RowBox[{"[", "3", "]"}], "]"}], "2"]}]]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2yaw", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+       RowBox[{"[", "3", "]"}], "]"}], "[", 
+      RowBox[{"[", "2", "]"}], "]"}], ",", 
+     RowBox[{
+      RowBox[{"PyramidExampleCMG2rotationMatrix", "[", 
+       RowBox[{"[", "3", "]"}], "]"}], "[", 
+      RowBox[{"[", "3", "]"}], "]"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2rotation", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6082952813565893`*^9, 3.608295283155518*^9}, {
+  3.6082953381764793`*^9, 3.608295342960499*^9}, {3.6082955117206984`*^9, 
+  3.608295557359346*^9}, {3.6082956715933857`*^9, 3.6082956867901497`*^9}, {
+  3.608295856452222*^9, 3.6082958597398787`*^9}, {3.6082959155967827`*^9, 
+  3.6082959260369387`*^9}, {3.608296239949452*^9, 3.608296242417253*^9}, {
+  3.608296342015828*^9, 3.608296344215929*^9}, {3.608296499810145*^9, 
+  3.6082966267244787`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG2", "=", 
+   RowBox[{"RotorFrameAxes", "[", 
+    RowBox[{
+    "PyramidExampleCMG2xmid", ",", "PyramidExampleCMG2ymid", ",", 
+     "PyramidExampleCMG2zmid", ",", "PyramidExampleExtraLength", ",", 
+     "PyramidExampleCMG2rotation", ",", "PyramidExampleThickness", ",", 
+     "PyramidExampleRadius", ",", "PyramidExampleCMG2roll", ",", 
+     "PyramidExampleCMG2pitch", ",", "PyramidExampleCMG2yaw"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Graphics3D", "[", "PyramidExampleCMG2", "]"}]}], "Input",
+ CellChangeTimes->{{3.60829558136926*^9, 3.608295595542818*^9}, {
+  3.608295632100564*^9, 3.608295773908864*^9}, {3.6082960557370043`*^9, 
+  3.6082960626633043`*^9}, {3.608296245285934*^9, 3.608296276714126*^9}, {
+  3.60830272664598*^9, 3.60830272726587*^9}, {3.608302810496426*^9, 
+  3.6083028111513977`*^9}, {3.6083028481256437`*^9, 3.608302853754795*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   CylinderBox[{{-8.631163818370575*^-17, 
+    7.4095760221444955`, -0.2867882181755238}, {8.631163818370575*^-17, 
+    6.5904239778555045`, 0.2867882181755238}}, 3], 
+   {RGBColor[1, 0, 0], 
+    Arrow3DBox[{{0, 7, 0}, {2.63410705066371*^-16, 
+      2.6981767273671426`, -6.143640332167431}}]}, 
+   {RGBColor[0.5, 0, 0.5], 
+    Arrow3DBox[{{0, 7, 0}, {-7.5, 6.999999999999999, 
+      5.26821410132742*^-16}}]}, 
+   {RGBColor[1, 1, 0], 
+    Arrow3DBox[{{0, 7, 0}, {-5.178698291022345*^-16, 
+      9.457456132866973, -1.7207293090531428`}}]}, {
+    {GrayLevel[0], 
+     TubeBox[{{1.6155856577404086`*^-16, 
+      4.361548392785181, -3.7680994037293574`}, {1.2643713843185805`*^-16, 
+      4.935124829136228, -2.948947359440367}}, 0.05]}, 
+    {GrayLevel[0], 
+     TubeBox[{{-1.2643713843185805`*^-16, 9.064875170863772, 
+      2.948947359440367}, {-1.6155856577404086`*^-16, 9.638451607214819, 
+      3.7680994037293574`}}, 0.05]}, 
+    {RGBColor[0, 1, 0], 
+     TubeBox[{{1.2643713843185805`*^-16, 
+      4.935124829136228, -2.948947359440367}, {2.2863172611411157`*^-17, 
+      5.426616055709623, -3.293093221250995}, {-2.3001110425230498`*^-16, 
+      9.556366397437166, 2.6048014976297384`}, {-2.2863172611411157`*^-17, 
+      8.573383944290377, 3.293093221250995}, {2.3001110425230498`*^-16, 
+      4.443633602562834, -2.6048014976297384`}, {1.2643713843185805`*^-16, 
+      4.935124829136228, -2.948947359440367}}, 0.05]}}}]], "Output",
+ CellChangeTimes->{{3.608296854252931*^9, 3.6082968701878357`*^9}, {
+   3.608296912378083*^9, 3.608296965078631*^9}, {3.608297003401908*^9, 
+   3.6082970496742573`*^9}, {3.6082971041109467`*^9, 3.608297187994615*^9}, {
+   3.6082972206323633`*^9, 3.6082972716029778`*^9}, 3.6082973480914383`*^9, {
+   3.608297413550283*^9, 3.608297480017315*^9}, 3.608297515355874*^9, {
+   3.608297583678092*^9, 3.608297641192884*^9}, 3.6082977940862303`*^9, {
+   3.608297886517009*^9, 3.608297907935569*^9}, {3.60829794300791*^9, 
+   3.608297968637431*^9}, 3.60829802171227*^9, 3.608298081206017*^9, 
+   3.608302327245488*^9, 3.608302499333189*^9, 3.608302642045084*^9, 
+   3.608302695201682*^9, 3.608302864716406*^9, {3.608302929006196*^9, 
+   3.608302965125929*^9}}]
+}, Open  ]],
+
+Cell["CMG 3", "Text",
+ CellChangeTimes->{{3.6082956269729757`*^9, 3.6082956280404253`*^9}, {
+  3.608296230529155*^9, 3.60829623070415*^9}, {3.608297300584372*^9, 
+  3.6082973007037163`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3xmid", "=", 
+   RowBox[{"-", "7"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3ymid", "=", "0"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3zmid", "=", "0"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608295174670871*^9, 3.6082952145429068`*^9}, {
+  3.608296233321249*^9, 3.6082962351931753`*^9}, {3.608296292786252*^9, 
+  3.608296295649993*^9}, {3.6082967348104057`*^9, 3.608296757740395*^9}, {
+  3.6082973365651703`*^9, 3.60829736585704*^9}, {3.60829806609968*^9, 
+  3.60829806627522*^9}}],
+
+Cell["Some scratch work", "Text",
+ CellChangeTimes->{{3.608296407056615*^9, 3.608296410950754*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3rotationMatrix", "=", 
+   RowBox[{
+    RowBox[{"Rx", "[", 
+     RowBox[{"(", 
+      RowBox[{"PyramidExampleIncidenceAngle", "-", 
+       RowBox[{"90", "\[Degree]"}]}], ")"}], "]"}], ".", 
+    RowBox[{"Rz", "[", 
+     RowBox[{"90", "\[Degree]"}], "]"}], ".", 
+    RowBox[{"Ry", "[", "0", "]"}]}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608296428624057*^9, 3.608296475900834*^9}, {
+   3.608296663080711*^9, 3.608296677296843*^9}, {3.608296787258505*^9, 
+   3.608297044796633*^9}, {3.608297094895246*^9, 3.608297181906649*^9}, {
+   3.608297215020464*^9, 3.608297265660041*^9}, {3.608297369225868*^9, 
+   3.6082973693292828`*^9}, 3.608297474832581*^9}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3roll", "=", 
+   RowBox[{"180", "\[Degree]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3pitch", "=", 
+   RowBox[{
+    RowBox[{"90", "\[Degree]"}], "-", "PyramidExampleIncidenceAngle"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3yaw", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3rotation", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6082952813565893`*^9, 3.608295283155518*^9}, {
+  3.6082953381764793`*^9, 3.608295342960499*^9}, {3.6082955117206984`*^9, 
+  3.608295557359346*^9}, {3.6082956715933857`*^9, 3.6082956867901497`*^9}, {
+  3.608295856452222*^9, 3.6082958597398787`*^9}, {3.6082959155967827`*^9, 
+  3.6082959260369387`*^9}, {3.608296239949452*^9, 3.608296242417253*^9}, {
+  3.608296342015828*^9, 3.608296344215929*^9}, {3.608296499810145*^9, 
+  3.6082966267244787`*^9}, {3.608297373655048*^9, 3.6082973767428226`*^9}, {
+  3.608297488093821*^9, 3.608297509684639*^9}, {3.608297545134123*^9, 
+  3.608297635377219*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG3", "=", 
+   RowBox[{"RotorFrameAxes", "[", 
+    RowBox[{
+    "PyramidExampleCMG3xmid", ",", "PyramidExampleCMG3ymid", ",", 
+     "PyramidExampleCMG3zmid", ",", "PyramidExampleExtraLength", ",", 
+     "PyramidExampleCMG3rotation", ",", "PyramidExampleThickness", ",", 
+     "PyramidExampleRadius", ",", "PyramidExampleCMG3roll", ",", 
+     "PyramidExampleCMG3pitch", ",", "PyramidExampleCMG3yaw"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Graphics3D", "[", "PyramidExampleCMG3", "]"}]}], "Input",
+ CellChangeTimes->{{3.60829558136926*^9, 3.608295595542818*^9}, {
+  3.608295632100564*^9, 3.608295773908864*^9}, {3.6082960557370043`*^9, 
+  3.6082960626633043`*^9}, {3.608296245285934*^9, 3.608296276714126*^9}, {
+  3.6082973804459667`*^9, 3.608297407778726*^9}, {3.608302731858179*^9, 
+  3.6083027324499826`*^9}, {3.6083028172436666`*^9, 3.608302842826548*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   CylinderBox[
+    NCache[{{-7 + Rational[-1, 2] Cos[35 Degree], 0, Rational[-1, 2] 
+       Sin[35 Degree]}, {-7 + Rational[1, 2] Cos[35 Degree], 0, 
+       Rational[1, 2] Sin[35 Degree]}}, {{-7.4095760221444955`, 
+       0, -0.286788218175523}, {-6.5904239778555045`, 0, 0.286788218175523}}],
+     3], 
+   {RGBColor[1, 0, 0], 
+    Arrow3DBox[{{-7, 0, 0}, {-2.698176727367155, 0., -6.143640332167439}}]}, 
+   {RGBColor[0.5, 0, 0.5], Arrow3DBox[{{-7, 0, 0}, {-7., -7.5, 0.}}]}, 
+   {RGBColor[1, 1, 0], 
+    Arrow3DBox[
+     NCache[{{-7, 0, 
+       0}, {-7 - 3 Cos[35 Degree], 0, (-3) Sin[35 Degree]}}, {{-7, 0, 
+       0}, {-9.457456132866975, 0, -1.7207293090531381`}}]]}, {
+    {GrayLevel[0], 
+     TubeBox[{{-4.361548392785188, 
+      0., -3.768099403729362}, {-4.935124829136234, 
+      0., -2.9489473594403703`}}, 0.05]}, 
+    {GrayLevel[0], 
+     TubeBox[{{-9.064875170863765, 0., 
+      2.9489473594403703`}, {-9.638451607214812, 0., 3.768099403729362}}, 
+      0.05]}, 
+    {RGBColor[0, 1, 0], 
+     TubeBox[{{-4.935124829136234, 
+      0., -2.9489473594403703`}, {-5.426616055709629, 
+      0., -3.293093221250998}, {-9.55636639743716, 0., 
+      2.604801497629743}, {-8.57338394429037, 0., 
+      3.293093221250998}, {-4.44363360256284, 
+      0., -2.604801497629743}, {-4.935124829136234, 
+      0., -2.9489473594403703`}}, 0.05]}}},
+  AutomaticImageSize->True,
+  ImageSize->{369.06821277556287`, 260.26621760722566`},
+  ViewPoint->{1.9080793763048285`, -2.364067528261174, 1.490106645693952},
+  ViewVertical->{0.31018152360610385`, 0.004062917974251409, 
+   1.8140621488107063`}]], "Output",
+ CellChangeTimes->{{3.608296854252931*^9, 3.6082968701878357`*^9}, {
+   3.608296912378083*^9, 3.608296965078631*^9}, {3.608297003401908*^9, 
+   3.6082970496742573`*^9}, {3.6082971041109467`*^9, 3.608297187994615*^9}, {
+   3.6082972206323633`*^9, 3.6082972716029778`*^9}, 3.608297348288961*^9, {
+   3.6082974138510923`*^9, 3.608297480278297*^9}, 3.6082975157410593`*^9, {
+   3.608297584089608*^9, 3.608297641593822*^9}, 3.608297794488489*^9, {
+   3.6082978868016157`*^9, 3.608297908225993*^9}, {3.608297943428708*^9, 
+   3.6082979689511213`*^9}, 3.6082980220471687`*^9, 3.608298081578599*^9, 
+   3.608302327365859*^9, 3.608302499522996*^9, 3.6083026423765583`*^9, 
+   3.608302695318083*^9, 3.608302865092442*^9, {3.608302929667268*^9, 
+   3.608302965300317*^9}}]
+}, Open  ]],
+
+Cell["CMG 4", "Text",
+ CellChangeTimes->{{3.6082956269729757`*^9, 3.6082956280404253`*^9}, {
+  3.608296230529155*^9, 3.60829623070415*^9}, {3.608297778539307*^9, 
+  3.608297780266176*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4xmid", "=", "0"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4ymid", "=", 
+   RowBox[{"-", "7"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4zmid", "=", "0"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.608295174670871*^9, 3.6082952145429068`*^9}, {
+  3.608296233321249*^9, 3.6082962351931753`*^9}, {3.608296292786252*^9, 
+  3.608296295649993*^9}, {3.6082967348104057`*^9, 3.608296757740395*^9}, {
+  3.608297787780588*^9, 3.6082978044274178`*^9}, {3.608298063200529*^9, 
+  3.608298063369128*^9}}],
+
+Cell["Some scratch work", "Text",
+ CellChangeTimes->{{3.608296407056615*^9, 3.608296410950754*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4rotationMatrix", "=", 
+   RowBox[{
+    RowBox[{"Ry", "[", 
+     RowBox[{"180", "\[Degree]"}], "]"}], ".", 
+    RowBox[{"Rx", "[", 
+     RowBox[{"-", 
+      RowBox[{"(", 
+       RowBox[{"PyramidExampleIncidenceAngle", "-", 
+        RowBox[{"90", "\[Degree]"}]}], ")"}]}], "]"}], ".", 
+    RowBox[{"Rz", "[", 
+     RowBox[{"90", "\[Degree]"}], "]"}], ".", 
+    RowBox[{"Ry", "[", 
+     RowBox[{"89.9999999999999", "\[Degree]"}], "]"}]}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.608296428624057*^9, 3.608296475900834*^9}, {
+  3.608296663080711*^9, 3.608296677296843*^9}, {3.608296787258505*^9, 
+  3.608297044796633*^9}, {3.608297094895246*^9, 3.608297181906649*^9}, {
+  3.608297215020464*^9, 3.608297265660041*^9}, {3.608297808344165*^9, 
+  3.608297808449727*^9}, {3.608297900929844*^9, 3.608297935699237*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4roll", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+       RowBox[{"[", "2", "]"}], "]"}], "[", 
+      RowBox[{"[", "1", "]"}], "]"}], ",", 
+     RowBox[{
+      RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+       RowBox[{"[", "1", "]"}], "]"}], "[", 
+      RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4pitch", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{"-", 
+      RowBox[{
+       RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+        RowBox[{"[", "3", "]"}], "]"}], "[", 
+       RowBox[{"[", "1", "]"}], "]"}]}], ",", 
+     SqrtBox[
+      RowBox[{
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "2"], "+", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+          RowBox[{"[", "3", "]"}], "]"}], "[", 
+         RowBox[{"[", "3", "]"}], "]"}], "2"]}]]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4yaw", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+       RowBox[{"[", "3", "]"}], "]"}], "[", 
+      RowBox[{"[", "2", "]"}], "]"}], ",", 
+     RowBox[{
+      RowBox[{"PyramidExampleCMG4rotationMatrix", "[", 
+       RowBox[{"[", "3", "]"}], "]"}], "[", 
+      RowBox[{"[", "3", "]"}], "]"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4rotation", "=", 
+   RowBox[{"0", "\[Degree]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6082952813565893`*^9, 3.608295283155518*^9}, {
+  3.6082953381764793`*^9, 3.608295342960499*^9}, {3.6082955117206984`*^9, 
+  3.608295557359346*^9}, {3.6082956715933857`*^9, 3.6082956867901497`*^9}, {
+  3.608295856452222*^9, 3.6082958597398787`*^9}, {3.6082959155967827`*^9, 
+  3.6082959260369387`*^9}, {3.608296239949452*^9, 3.608296242417253*^9}, {
+  3.608296342015828*^9, 3.608296344215929*^9}, {3.608296499810145*^9, 
+  3.6082966267244787`*^9}, {3.608297812329377*^9, 3.6082978477452497`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"PyramidExampleCMG4", "=", 
+   RowBox[{"RotorFrameAxes", "[", 
+    RowBox[{
+    "PyramidExampleCMG4xmid", ",", "PyramidExampleCMG4ymid", ",", 
+     "PyramidExampleCMG4zmid", ",", "PyramidExampleExtraLength", ",", 
+     "PyramidExampleCMG4rotation", ",", "PyramidExampleThickness", ",", 
+     "PyramidExampleRadius", ",", "PyramidExampleCMG4roll", ",", 
+     "PyramidExampleCMG4pitch", ",", "PyramidExampleCMG4yaw"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Graphics3D", "[", "PyramidExampleCMG4", "]"}]}], "Input",
+ CellChangeTimes->{{3.60829558136926*^9, 3.608295595542818*^9}, {
+  3.608295632100564*^9, 3.608295773908864*^9}, {3.6082960557370043`*^9, 
+  3.6082960626633043`*^9}, {3.608296245285934*^9, 3.608296276714126*^9}, {
+  3.608297822785033*^9, 3.608297869228704*^9}, {3.6083027367581797`*^9, 
+  3.6083027398762836`*^9}, {3.608302823427062*^9, 3.608302834459528*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{
+   CylinderBox[{{
+    2.5079298226338156`*^-17, -7.409576022144496, -0.2867882181755222}, \
+{-2.5079298226338156`*^-17, -6.590423977855504, 0.2867882181755222}}, 3], 
+   {RGBColor[1, 0, 0], 
+    Arrow3DBox[{{0, -7, 
+      0}, {-2.6341070506636953`*^-16, -2.6981767273671675`, \
+-6.143640332167448}}]}, 
+   {RGBColor[0.5, 0, 0.5], 
+    Arrow3DBox[{{0, -7, 0}, {7.5, -6.999999999999999, 0.}}]}, 
+   {RGBColor[1, 1, 0], 
+    Arrow3DBox[{{0, -7, 0}, {
+      1.5047578935802894`*^-16, -9.45745613286698, -1.7207293090531333`}}]}, \
+{
+    {GrayLevel[0], 
+     TubeBox[{{-1.6155856577403995`*^-16, -4.3615483927851955`, \
+-3.7680994037293676`}, {-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}}, 0.05]}, 
+    {GrayLevel[0], 
+     TubeBox[{{1.2643713843185734`*^-16, -9.06487517086376, 
+      2.948947359440375}, {1.6155856577403995`*^-16, -9.638451607214805, 
+      3.7680994037293676`}}, 0.05]}, 
+    {RGBColor[0, 1, 0], 
+     TubeBox[{{-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}, {-9.634198056025155*^-17, -5.426616055709636, \
+-3.2930932212510013`}, {1.5653229630346313`*^-16, -9.556366397437156, 
+      2.604801497629748}, {9.634198056025155*^-17, -8.573383944290363, 
+      3.2930932212510013`}, {-1.5653229630346313`*^-16, -4.443633602562845, \
+-2.604801497629748}, {-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}}, 0.05]}}}]], "Output",
+ CellChangeTimes->{{3.608296854252931*^9, 3.6082968701878357`*^9}, {
+   3.608296912378083*^9, 3.608296965078631*^9}, {3.608297003401908*^9, 
+   3.6082970496742573`*^9}, {3.6082971041109467`*^9, 3.608297187994615*^9}, {
+   3.6082972206323633`*^9, 3.6082972716029778`*^9}, 3.6082973480914383`*^9, {
+   3.608297413550283*^9, 3.608297480017315*^9}, 3.608297515355874*^9, {
+   3.608297583678092*^9, 3.608297641192884*^9}, 3.608297794771103*^9, {
+   3.608297887112815*^9, 3.6082979087800407`*^9}, {3.608297944206574*^9, 
+   3.608297969452012*^9}, 3.608298022386279*^9, 3.60829808310327*^9, 
+   3.608302327634265*^9, 3.608302499695012*^9, 3.608302642526993*^9, 
+   3.608302695510789*^9, 3.6083028652415037`*^9, {3.60830293007592*^9, 
+   3.6083029659365053`*^9}}]
+}, Open  ]],
+
+Cell["All together now", "Text",
+ CellChangeTimes->{{3.608296284342108*^9, 3.608296288601074*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Graphics3D", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+    "PyramidExampleCMG1", ",", "PyramidExampleCMG2", ",", 
+     "PyramidExampleCMG3", ",", "PyramidExampleCMG4"}], "}"}], ",", 
+   RowBox[{"Boxed", "\[Rule]", "False"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.608296302498682*^9, 3.608296333190447*^9}, {
+  3.6082974192793713`*^9, 3.608297425881988*^9}, {3.608297875632373*^9, 
+  3.608297879560649*^9}, {3.608297956090879*^9, 3.608297961475679*^9}}],
+
+Cell[BoxData[
+ Graphics3DBox[{{
+    CylinderBox[
+     NCache[{{7 + Rational[1, 2] Cos[35 Degree], 0, Rational[-1, 2] 
+        Sin[35 Degree]}, {
+       7 + Rational[-1, 2] Cos[35 Degree], 0, Rational[1, 2] 
+        Sin[35 Degree]}}, {{7.4095760221444955`, 0, -0.286788218175523}, {
+       6.5904239778555045`, 0, 0.286788218175523}}], 3], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[{{7, 0, 0}, {2.698176727367155, 0., -6.143640332167439}}]}, 
+    {RGBColor[0.5, 0, 0.5], Arrow3DBox[{{7, 0, 0}, {7., 7.5, 0.}}]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[
+      NCache[{{7, 0, 0}, {7 + 3 Cos[35 Degree], 0, (-3) Sin[35 Degree]}}, {{7,
+         0, 0}, {9.457456132866975, 0, -1.7207293090531381`}}]]}, {
+     {GrayLevel[0], 
+      TubeBox[{{4.361548392785188, 0., -3.768099403729362}, {
+       4.935124829136234, 0., -2.9489473594403703`}}, 0.05]}, 
+     {GrayLevel[0], 
+      TubeBox[{{9.064875170863765, 0., 2.9489473594403703`}, {
+       9.638451607214812, 0., 3.768099403729362}}, 0.05]}, 
+     {RGBColor[0, 1, 0], 
+      TubeBox[{{4.935124829136234, 0., -2.9489473594403703`}, {
+       5.426616055709629, 0., -3.293093221250998}, {9.55636639743716, 0., 
+       2.604801497629743}, {8.57338394429037, 0., 3.293093221250998}, {
+       4.44363360256284, 0., -2.604801497629743}, {4.935124829136234, 
+       0., -2.9489473594403703`}}, 0.05]}}}, {
+    CylinderBox[{{-8.631163818370575*^-17, 
+     7.4095760221444955`, -0.2867882181755238}, {8.631163818370575*^-17, 
+     6.5904239778555045`, 0.2867882181755238}}, 3], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[{{0, 7, 0}, {2.63410705066371*^-16, 
+       2.6981767273671426`, -6.143640332167431}}]}, 
+    {RGBColor[0.5, 0, 0.5], 
+     Arrow3DBox[{{0, 7, 0}, {-7.5, 6.999999999999999, 
+       5.26821410132742*^-16}}]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[{{0, 7, 0}, {-5.178698291022345*^-16, 
+       9.457456132866973, -1.7207293090531428`}}]}, {
+     {GrayLevel[0], 
+      TubeBox[{{1.6155856577404086`*^-16, 
+       4.361548392785181, -3.7680994037293574`}, {1.2643713843185805`*^-16, 
+       4.935124829136228, -2.948947359440367}}, 0.05]}, 
+     {GrayLevel[0], 
+      TubeBox[{{-1.2643713843185805`*^-16, 9.064875170863772, 
+       2.948947359440367}, {-1.6155856577404086`*^-16, 9.638451607214819, 
+       3.7680994037293574`}}, 0.05]}, 
+     {RGBColor[0, 1, 0], 
+      TubeBox[{{1.2643713843185805`*^-16, 
+       4.935124829136228, -2.948947359440367}, {2.2863172611411157`*^-17, 
+       5.426616055709623, -3.293093221250995}, {-2.3001110425230498`*^-16, 
+       9.556366397437166, 2.6048014976297384`}, {-2.2863172611411157`*^-17, 
+       8.573383944290377, 3.293093221250995}, {2.3001110425230498`*^-16, 
+       4.443633602562834, -2.6048014976297384`}, {1.2643713843185805`*^-16, 
+       4.935124829136228, -2.948947359440367}}, 0.05]}}}, {
+    CylinderBox[
+     NCache[{{-7 + Rational[-1, 2] Cos[35 Degree], 0, Rational[-1, 2] 
+        Sin[35 Degree]}, {-7 + Rational[1, 2] Cos[35 Degree], 0, 
+        Rational[1, 2] Sin[35 Degree]}}, {{-7.4095760221444955`, 
+        0, -0.286788218175523}, {-6.5904239778555045`, 0, 
+        0.286788218175523}}], 3], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[{{-7, 0, 0}, {-2.698176727367155, 
+       0., -6.143640332167439}}]}, 
+    {RGBColor[0.5, 0, 0.5], Arrow3DBox[{{-7, 0, 0}, {-7., -7.5, 0.}}]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[
+      NCache[{{-7, 0, 
+        0}, {-7 - 3 Cos[35 Degree], 0, (-3) Sin[35 Degree]}}, {{-7, 0, 
+        0}, {-9.457456132866975, 0, -1.7207293090531381`}}]]}, {
+     {GrayLevel[0], 
+      TubeBox[{{-4.361548392785188, 
+       0., -3.768099403729362}, {-4.935124829136234, 
+       0., -2.9489473594403703`}}, 0.05]}, 
+     {GrayLevel[0], 
+      TubeBox[{{-9.064875170863765, 0., 
+       2.9489473594403703`}, {-9.638451607214812, 0., 3.768099403729362}}, 
+       0.05]}, 
+     {RGBColor[0, 1, 0], 
+      TubeBox[{{-4.935124829136234, 
+       0., -2.9489473594403703`}, {-5.426616055709629, 
+       0., -3.293093221250998}, {-9.55636639743716, 0., 
+       2.604801497629743}, {-8.57338394429037, 0., 
+       3.293093221250998}, {-4.44363360256284, 
+       0., -2.604801497629743}, {-4.935124829136234, 
+       0., -2.9489473594403703`}}, 0.05]}}}, {
+    CylinderBox[{{
+     2.5079298226338156`*^-17, -7.409576022144496, -0.2867882181755222}, \
+{-2.5079298226338156`*^-17, -6.590423977855504, 0.2867882181755222}}, 3], 
+    {RGBColor[1, 0, 0], 
+     Arrow3DBox[{{0, -7, 
+       0}, {-2.6341070506636953`*^-16, -2.6981767273671675`, \
+-6.143640332167448}}]}, 
+    {RGBColor[0.5, 0, 0.5], 
+     Arrow3DBox[{{0, -7, 0}, {7.5, -6.999999999999999, 0.}}]}, 
+    {RGBColor[1, 1, 0], 
+     Arrow3DBox[{{0, -7, 0}, {
+       1.5047578935802894`*^-16, -9.45745613286698, -1.7207293090531333`}}]}, {
+     {GrayLevel[0], 
+      TubeBox[{{-1.6155856577403995`*^-16, -4.3615483927851955`, \
+-3.7680994037293676`}, {-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}}, 0.05]}, 
+     {GrayLevel[0], 
+      TubeBox[{{1.2643713843185734`*^-16, -9.06487517086376, 
+       2.948947359440375}, {1.6155856577403995`*^-16, -9.638451607214805, 
+       3.7680994037293676`}}, 0.05]}, 
+     {RGBColor[0, 1, 0], 
+      TubeBox[{{-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}, {-9.634198056025155*^-17, -5.426616055709636, \
+-3.2930932212510013`}, {1.5653229630346313`*^-16, -9.556366397437156, 
+       2.604801497629748}, {9.634198056025155*^-17, -8.573383944290363, 
+       3.2930932212510013`}, {-1.5653229630346313`*^-16, -4.443633602562845, \
+-2.604801497629748}, {-1.2643713843185734`*^-16, -4.935124829136241, \
+-2.948947359440375}}, 0.05]}}}},
+  Boxed->False,
+  ImageSize->{829.0612176450365, 487.},
+  ViewPoint->{-2.8820903636987625`, 1.1096633598471932`, -1.3828240536262766`},
+  ViewVertical->{-0.07866325390102757, 
+   0.09759056185375528, -1.9297911604825864`}]], "Output",
+ CellChangeTimes->{{3.608296948193829*^9, 3.608296965172537*^9}, {
+   3.608297003511648*^9, 3.608297049749379*^9}, {3.608297104195182*^9, 
+   3.6082971881064253`*^9}, {3.608297220724409*^9, 3.608297271694387*^9}, 
+   3.608297348427273*^9, {3.608297413961718*^9, 3.608297480504074*^9}, 
+   3.608297515867526*^9, {3.6082975842996273`*^9, 3.608297641688862*^9}, 
+   3.608297794823485*^9, {3.608297887341217*^9, 3.608297910135556*^9}, {
+   3.60829794433539*^9, 3.6082979695841093`*^9}, 3.6082980224742823`*^9, 
+   3.608298084175589*^9, 3.608302327670368*^9, 3.608302499749469*^9, 
+   3.608302642566257*^9, 3.608302695712829*^9, 3.6083028652815104`*^9, {
+   3.608302930345541*^9, 3.6083029674480667`*^9}}]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1368, 1200},
+WindowMargins->{{56, Automatic}, {Automatic, 43}},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 132, 3, 92, "Title"],
+Cell[714, 27, 172, 4, 51, "Subtitle"],
+Cell[889, 33, 173, 7, 109, "Subsubtitle"],
+Cell[1065, 42, 703, 11, 68, "Text"],
+Cell[1771, 55, 139, 2, 28, "Input"],
+Cell[CellGroupData[{
+Cell[1935, 61, 104, 1, 80, "Section"],
+Cell[CellGroupData[{
+Cell[2064, 66, 97, 1, 44, "Subsection"],
+Cell[CellGroupData[{
+Cell[2186, 71, 108, 1, 35, "Subsubsection"],
+Cell[2297, 74, 1279, 40, 179, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3613, 119, 119, 1, 35, "Subsubsection"],
+Cell[3735, 122, 132, 3, 30, "Text"],
+Cell[3870, 127, 350, 9, 28, "Input"]
+}, Open  ]]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[4281, 143, 116, 1, 50, "Section"],
+Cell[CellGroupData[{
+Cell[4422, 148, 115, 1, 44, "Subsection"],
+Cell[4540, 151, 162, 3, 30, "Text"],
+Cell[CellGroupData[{
+Cell[4727, 158, 203, 4, 35, "Subsubsection"],
+Cell[4933, 164, 162, 2, 30, "Text"],
+Cell[5098, 168, 1300, 45, 121, "Input"],
+Cell[6401, 215, 1453, 42, 63, "Input"],
+Cell[7857, 259, 1519, 43, 63, "Input"],
+Cell[9379, 304, 225, 5, 30, "Text"],
+Cell[9607, 311, 1706, 42, 80, "Input"],
+Cell[11316, 355, 99, 1, 30, "Text"],
+Cell[CellGroupData[{
+Cell[11440, 360, 1095, 31, 46, "Input"],
+Cell[12538, 393, 5141, 87, 465, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17716, 485, 827, 18, 46, "Input"],
+Cell[18546, 505, 2970, 48, 299, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21565, 559, 106, 1, 35, "Subsubsection"],
+Cell[21674, 562, 99, 1, 30, "Text"],
+Cell[21776, 565, 978, 33, 121, "Input"],
+Cell[22757, 600, 1531, 43, 63, "Input"],
+Cell[24291, 645, 1521, 43, 63, "Input"],
+Cell[25815, 690, 1550, 40, 97, "Input"],
+Cell[27368, 732, 150, 2, 30, "Text"],
+Cell[27521, 736, 1028, 34, 121, "Input"],
+Cell[28552, 772, 1579, 44, 63, "Input"],
+Cell[30134, 818, 1619, 45, 63, "Input"],
+Cell[31756, 865, 1503, 39, 97, "Input"],
+Cell[33262, 906, 147, 2, 30, "Text"],
+Cell[33412, 910, 1028, 34, 121, "Input"],
+Cell[34443, 946, 1580, 44, 63, "Input"],
+Cell[36026, 992, 1570, 44, 63, "Input"],
+Cell[37599, 1038, 1501, 39, 97, "Input"],
+Cell[39103, 1079, 432, 7, 30, "Text"],
+Cell[39538, 1088, 1333, 33, 63, "Input"],
+Cell[40874, 1123, 91, 1, 30, "Text"],
+Cell[CellGroupData[{
+Cell[40990, 1128, 1120, 31, 46, "Input"],
+Cell[42113, 1161, 5085, 86, 465, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[47235, 1252, 743, 16, 46, "Input"],
+Cell[47981, 1270, 4321, 80, 344, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[52351, 1356, 191, 2, 35, "Subsubsection"],
+Cell[52545, 1360, 479, 8, 49, "Text"],
+Cell[53027, 1370, 2989, 79, 189, "Input"],
+Cell[56019, 1451, 2647, 74, 170, "Input"],
+Cell[58669, 1527, 2748, 77, 189, "Input"],
+Cell[61420, 1606, 2775, 78, 189, "Input"],
+Cell[64198, 1686, 2676, 75, 170, "Input"],
+Cell[66877, 1763, 2751, 77, 189, "Input"],
+Cell[69631, 1842, 1528, 37, 114, "Input"],
+Cell[71162, 1881, 2851, 80, 189, "Input"],
+Cell[74016, 1963, 2824, 79, 189, "Input"],
+Cell[76843, 2044, 1579, 38, 114, "Input"],
+Cell[78425, 2084, 1533, 37, 114, "Input"],
+Cell[79961, 2123, 111, 1, 30, "Text"],
+Cell[80075, 2126, 9815, 206, 590, "Input"],
+Cell[CellGroupData[{
+Cell[89915, 2336, 1294, 34, 46, "Input"],
+Cell[91212, 2372, 4864, 84, 506, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[96125, 2462, 164, 3, 35, "Subsubsection"],
+Cell[96292, 2467, 937, 21, 46, "Input"],
+Cell[97232, 2490, 1758, 43, 80, "Input"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[99051, 2540, 109, 1, 80, "Section"],
+Cell[99163, 2543, 573, 9, 49, "Text"],
+Cell[CellGroupData[{
+Cell[99761, 2556, 111, 1, 44, "Subsection"],
+Cell[CellGroupData[{
+Cell[99897, 2561, 115, 1, 35, "Subsubsection"],
+Cell[100015, 2564, 443, 8, 30, "Text"],
+Cell[CellGroupData[{
+Cell[100483, 2576, 143, 3, 28, "Item"],
+Cell[100629, 2581, 143, 3, 28, "Item"],
+Cell[100775, 2586, 145, 3, 28, "Item"],
+Cell[100923, 2591, 129, 3, 28, "Item"],
+Cell[101055, 2596, 123, 3, 28, "Item"],
+Cell[101181, 2601, 205, 4, 28, "Item"],
+Cell[101389, 2607, 208, 4, 28, "Item"],
+Cell[101600, 2613, 206, 4, 28, "Item"]
+}, Open  ]],
+Cell[101821, 2620, 315, 7, 30, "Text"],
+Cell[CellGroupData[{
+Cell[102161, 2631, 777, 21, 46, "Input"],
+Cell[102941, 2654, 3820, 67, 608, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[106810, 2727, 164, 2, 35, "Subsubsection"],
+Cell[106977, 2731, 928, 15, 68, "Text"],
+Cell[CellGroupData[{
+Cell[107930, 2750, 143, 3, 28, "Item"],
+Cell[108076, 2755, 143, 3, 28, "Item"],
+Cell[108222, 2760, 145, 3, 28, "Item"],
+Cell[108370, 2765, 129, 3, 28, "Item"],
+Cell[108502, 2770, 123, 3, 28, "Item"],
+Cell[108628, 2775, 205, 4, 28, "Item"],
+Cell[108836, 2781, 208, 4, 28, "Item"],
+Cell[109047, 2787, 206, 4, 28, "Item"]
+}, Open  ]],
+Cell[109268, 2794, 342, 8, 30, "Text"],
+Cell[CellGroupData[{
+Cell[109635, 2806, 832, 22, 46, "Input"],
+Cell[110470, 2830, 3826, 67, 608, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[114345, 2903, 169, 2, 35, "Subsubsection"],
+Cell[114517, 2907, 589, 10, 49, "Text"],
+Cell[CellGroupData[{
+Cell[115131, 2921, 143, 3, 28, "Item"],
+Cell[115277, 2926, 143, 3, 28, "Item"],
+Cell[115423, 2931, 194, 4, 28, "Item"],
+Cell[115620, 2937, 242, 5, 28, "Item"],
+Cell[115865, 2944, 288, 5, 28, "Item"],
+Cell[116156, 2951, 129, 3, 28, "Item"],
+Cell[116288, 2956, 123, 3, 28, "Item"],
+Cell[116414, 2961, 205, 4, 28, "Item"],
+Cell[116622, 2967, 208, 4, 28, "Item"],
+Cell[116833, 2973, 206, 4, 28, "Item"]
+}, Open  ]],
+Cell[117054, 2980, 315, 7, 30, "Text"],
+Cell[CellGroupData[{
+Cell[117394, 2991, 1103, 29, 46, "Input"],
+Cell[118500, 3022, 4458, 76, 674, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[123007, 3104, 237, 5, 35, "Subsubsection"],
+Cell[123247, 3111, 1025, 15, 68, "Text"],
+Cell[CellGroupData[{
+Cell[124297, 3130, 143, 3, 28, "Item"],
+Cell[124443, 3135, 143, 3, 28, "Item"],
+Cell[124589, 3140, 194, 4, 28, "Item"],
+Cell[124786, 3146, 242, 5, 28, "Item"],
+Cell[125031, 3153, 288, 5, 28, "Item"],
+Cell[125322, 3160, 129, 3, 28, "Item"],
+Cell[125454, 3165, 123, 3, 28, "Item"],
+Cell[125580, 3170, 205, 4, 28, "Item"],
+Cell[125788, 3176, 208, 4, 28, "Item"],
+Cell[125999, 3182, 206, 4, 28, "Item"]
+}, Open  ]],
+Cell[126220, 3189, 315, 7, 30, "Text"],
+Cell[CellGroupData[{
+Cell[126560, 3200, 1223, 31, 46, "Input"],
+Cell[127786, 3233, 4304, 74, 664, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[132151, 3314, 95, 1, 44, "Subsection"],
+Cell[CellGroupData[{
+Cell[132271, 3319, 112, 1, 35, "Subsubsection"],
+Cell[132386, 3322, 585, 13, 80, "Input"],
+Cell[132974, 3337, 91, 1, 30, "Text"],
+Cell[133068, 3340, 391, 10, 63, "Input"],
+Cell[133462, 3352, 895, 19, 80, "Input"],
+Cell[CellGroupData[{
+Cell[134382, 3375, 830, 15, 63, "Input"],
+Cell[135215, 3392, 2539, 45, 322, "Output"]
+}, Open  ]],
+Cell[137769, 3440, 139, 2, 30, "Text"],
+Cell[137911, 3444, 541, 12, 63, "Input"],
+Cell[138455, 3458, 99, 1, 30, "Text"],
+Cell[138557, 3461, 670, 15, 28, "Input"],
+Cell[139230, 3478, 2230, 56, 124, "Input"],
+Cell[CellGroupData[{
+Cell[141485, 3538, 921, 16, 63, "Input"],
+Cell[142409, 3556, 2223, 40, 400, "Output"]
+}, Open  ]],
+Cell[144647, 3599, 190, 3, 30, "Text"],
+Cell[144840, 3604, 603, 13, 63, "Input"],
+Cell[145446, 3619, 99, 1, 30, "Text"],
+Cell[145548, 3622, 703, 15, 28, "Input"],
+Cell[146254, 3639, 1116, 22, 80, "Input"],
+Cell[CellGroupData[{
+Cell[147395, 3665, 925, 16, 63, "Input"],
+Cell[148323, 3683, 2396, 47, 275, "Output"]
+}, Open  ]],
+Cell[150734, 3733, 188, 3, 30, "Text"],
+Cell[150925, 3738, 606, 13, 63, "Input"],
+Cell[151534, 3753, 99, 1, 30, "Text"],
+Cell[151636, 3756, 861, 19, 28, "Input"],
+Cell[152500, 3777, 2278, 56, 124, "Input"],
+Cell[CellGroupData[{
+Cell[154803, 3837, 923, 16, 63, "Input"],
+Cell[155729, 3855, 2192, 41, 400, "Output"]
+}, Open  ]],
+Cell[157936, 3899, 98, 1, 30, "Text"],
+Cell[CellGroupData[{
+Cell[158059, 3904, 484, 10, 28, "Input"],
+Cell[158546, 3916, 6541, 128, 502, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
